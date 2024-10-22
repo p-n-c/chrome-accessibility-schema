@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "chrome-schema-validation",
+  "version": "0.0.0.1",
+  "permissions": [
+    "activeTab",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-scripts/content-script.js"
+      ]
+    }
+  ],
+  "action": {},
+  "icons": {},
+  "side_panel": {
+    "default_path": "sidepanel/side-panel.html"
+  }
+}
