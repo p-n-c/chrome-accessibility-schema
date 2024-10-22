@@ -5,12 +5,26 @@
   "author": "People and Code",
   "type": "module",
   "scripts": {
-    "lint": "eslint . && prettier --check . && stylelint '**/*.{css,scss}'"
+    "lint": "eslint . && prettier --check . && stylelint '**/*.{css,scss}'",
+    "tests": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "tests:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
   },
   "devDependencies": {
-    "eslint": "latest",
+    "@babel/core": "^7.25.9",
+    "@babel/preset-env": "^7.25.9",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.13.0",
+    "eslint-plugin-jest": "^28.8.3",
+    "jest": "^29.7.0",
     "prettier": "latest",
     "stylelint": "latest",
-    "stylelint-config-standard": "latest"
+    "stylelint-config-standard": "latest",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "testEnvironment": "jsdom"
   }
 }
