@@ -1,4 +1,7 @@
-import { htmlStringToDomElement } from '../../publish/content-scripts/utils'
+import {
+  htmlStringToDomElement,
+  simpleUid,
+} from '../../publish/resources/utils'
 
 describe('utils tests', () => {
   test('htmlStringToDomElement should convert HTML string to a DOM element', () => {
@@ -13,5 +16,9 @@ describe('utils tests', () => {
 
     // Check that the 'div' contains the correct text content
     expect(domElement.firstChild.textContent).toBe('Hello, World!')
+  })
+
+  test('simpleUid should return a string of length 16', () => {
+    expect(simpleUid()).toHaveLength(16)
   })
 })
