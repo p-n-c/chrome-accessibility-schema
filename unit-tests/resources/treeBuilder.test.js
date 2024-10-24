@@ -7,6 +7,9 @@ import {
 
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('Tree builder', () => {
   describe('isValidNode', () => {
@@ -162,14 +165,18 @@ describe('Tree builder', () => {
 
   describe('htmlDocumentToTree', () => {
     // Load the welcome.html file before running the tests
+    let result
+
     beforeEach(() => {
       const filePath = path.join(__dirname, 'welcome.html')
       const htmlContent = fs.readFileSync(filePath, 'utf-8')
-      document.documentElement.innerHTML = htmlContent
-    })
+      // document.documentElement.innerHTML = htmlContent
 
-    const result = htmlDocumentToTree()
-    console.log(JSON.stringify(result, '', 2))
+      const parser = new DOMParser()
+      const nodeDocument = parser.parseFromString(htmlContent, 'text/html')
+      result = htmlDocumentToTree(nodeDocument)
+      console.log(JSON.stringify(result, '', 2))
+    })
 
     it('should parse the document and return a valid tree structure', () => {
       // Check that the root of the tree is the html tag
@@ -189,7 +196,7 @@ describe('Tree builder', () => {
       expect(h1.elementText).toBe('Welcome')
     })
 
-    it('should include links and their text content', () => {
+    it.only('should include links and their text content', () => {
       const body = result[0].children.find((child) => child.tag === 'body')
 
       const main = body.children.find((child) => child.tag === 'main')

@@ -173,12 +173,14 @@ export const buildHtmlTree = (element) => {
   }
 }
 
-export const htmlDocumentToTree = () => {
+export const htmlDocumentToTree = (nodeDocument) => {
+  const _document = nodeDocument || document
+
   // Initialize an empty array to store the parsed elements
   const treeStructure = []
 
   // Get all elements in the document
-  const rootElements = Array.from(document.children)
+  const rootElements = Array.from(_document.children)
   console.log('Root elements:', rootElements)
 
   // Process each root element
