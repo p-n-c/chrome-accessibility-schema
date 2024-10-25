@@ -7,9 +7,8 @@ import {
 
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __dirname = path.resolve()
 
 describe('Tree builder', () => {
   describe('isValidNode', () => {
@@ -164,18 +163,38 @@ describe('Tree builder', () => {
   })
 
   describe('htmlDocumentToTree', () => {
+    const findAllNodesWithTag = (rootNode, tagName) => {
+      let matchingNodes = []
+      // Check the rootNode
+      if (rootNode?.tag === tagName) {
+        matchingNodes.push(rootNode)
+      }
+      try {
+        for (let child of rootNode.children) {
+          matchingNodes.push(...findAllNodesWithTag(child, tagName))
+        }
+      } catch (error) {
+        console.log(error)
+        console.log(JSON.stringify(rootNode, '', 2))
+      }
+      return matchingNodes
+    }
+
     // Load the welcome.html file before running the tests
     let result
 
     beforeEach(() => {
-      const filePath = path.join(__dirname, 'welcome.html')
+      const filePath = path.join(
+        __dirname,
+        'unit-tests',
+        'resources',
+        'welcome.html'
+      )
       const htmlContent = fs.readFileSync(filePath, 'utf-8')
-      // document.documentElement.innerHTML = htmlContent
 
       const parser = new DOMParser()
       const nodeDocument = parser.parseFromString(htmlContent, 'text/html')
       result = htmlDocumentToTree(nodeDocument)
-      console.log(JSON.stringify(result, '', 2))
     })
 
     it('should parse the document and return a valid tree structure', () => {
@@ -186,24 +205,22 @@ describe('Tree builder', () => {
       // Check that it has body and head as children
       const body = result[0].children.find((child) => child.tag === 'body')
       expect(body).toBeDefined()
-      // console.log(body)
 
       // Ensure that the tree contains the correct header content
       const header = body.children.find((child) => child.tag === 'header')
-      // console.log(header)
       expect(header).toBeDefined()
       const h1 = header.children.find((child) => child.tag === 'h1')
       expect(h1.elementText).toBe('Welcome')
     })
 
-    it.only('should include links and their text content', () => {
+    it('should include links and their text content', () => {
       const body = result[0].children.find((child) => child.tag === 'body')
 
       const main = body.children.find((child) => child.tag === 'main')
       expect(main).toBeDefined()
 
-      const links = main.children.filter((child) => child.tag === 'a')
-      expect(links.length).toBe(2)
+      const links = findAllNodesWithTag(main, 'a')
+      expect(links.length).toBe(8)
 
       // Check link text
       const firstLink = links.find((link) =>
@@ -215,10 +232,10 @@ describe('Tree builder', () => {
     it('should correctly handle images and their alt text', () => {
       const body = result[0].children.find((child) => child.tag === 'body')
 
-      const figure = body.children.find((child) => child.tag === 'figure')
-      expect(figure).toBeDefined()
+      const figures = findAllNodesWithTag(body, 'figure')
+      expect(figures).toBeDefined()
 
-      const images = figure.children.filter((child) => child.tag === 'img')
+      const images = findAllNodesWithTag(figures[0], 'img')
       expect(images.length).toBe(2)
 
       // Check the alt text of the images
@@ -228,24 +245,24 @@ describe('Tree builder', () => {
 
     it('should ignore script elements', () => {
       // Ensure there are no script elements in the final tree
-      const scripts = result[0].children.find((child) => child.tag === 'script')
-      expect(scripts).toBeUndefined()
+      const scripts = findAllNodesWithTag(result[0], 'script')
+      expect(scripts).toHaveLength(0)
     })
 
     it('should correctly build a tree with deeply nested elements', () => {
-      const result = htmlDocumentToTree()
-      const body = result[0].children.find((child) => child.tag === 'body')
+      const bodys = findAllNodesWithTag(result[0], 'body')
+      expect(bodys).toHaveLength(1)
 
-      const main = body.children.find((child) => child.tag === 'main')
-      expect(main).toBeDefined()
+      const mains = findAllNodesWithTag(bodys[0], 'main')
+      expect(mains).toHaveLength(1)
 
-      const dl = main.children.find((child) => child.tag === 'dl')
-      expect(dl).toBeDefined()
+      const dls = findAllNodesWithTag(mains[0], 'dl')
 
-      const dt = dl.children.find(
-        (child) => child.tag === 'dt' && child.elementText === 'Performance'
-      )
-      expect(dt).toBeDefined()
+      expect(dls).toBeDefined()
+
+      const dts = findAllNodesWithTag(dls[0], 'dt')
+      console.log(dts)
+      expect(dts.some((dt) => dt.elementText === 'Performance')).toBe(true)
     })
   })
 })

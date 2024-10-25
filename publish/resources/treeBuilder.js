@@ -13,6 +13,7 @@ const treeElements = [
   'button',
   'canvas',
   'caption',
+  'cite',
   'col',
   'colgroup',
   'dd',
@@ -81,7 +82,9 @@ const treeElements = [
 const treeElementsWithText = [
   'a',
   'button',
+  'dd',
   'div',
+  'dt',
   'h1',
   'h2',
   'h3',
@@ -161,7 +164,6 @@ export const buildHtmlTree = (element) => {
 
     // Recursively process each child element
     const children = element.children
-    console.log(node.tag, children.length)
     for (let child of children) {
       if (isValidNode(child)) {
         // Only process elements (ignore text, comments, scripts, etc.)
@@ -181,7 +183,6 @@ export const htmlDocumentToTree = (nodeDocument) => {
 
   // Get all elements in the document
   const rootElements = Array.from(_document.children)
-  console.log('Root elements:', rootElements)
 
   // Process each root element
   for (let element of rootElements) {
