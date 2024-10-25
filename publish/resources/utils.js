@@ -9,3 +9,9 @@ export const simpleUid = function () {
   const randomPart = Math.random().toString(36).substring(2, 10)
   return (datePart + randomPart).substring(0, 16)
 }
+
+export const isWebPage = function (url) {
+  return (
+    url !== undefined && (url.startsWith('http:') || url.startsWith('https:'))
+  )
+}

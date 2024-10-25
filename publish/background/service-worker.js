@@ -1,7 +1,20 @@
 let isSidePanelOpen = false
 let sidePanelPort = null
 
-chrome.action.onClicked.addListener((tab) => {
+const runTreeBuilder = () => {
+  console.log('runTreeBuilder')
+
+  if (typeof window.treeBuilder === 'undefined') {
+    console.error('treeBuilder is not loaded.')
+  } else {
+    // Use treeBuilder here on a fully loaded DOM
+    const result = window.treeBuilder.htmlDocumentToTree()
+    console.log('treeBuilder result:', result)
+    return result
+  }
+}
+
+chrome.action.onClicked.addListener(async (tab) => {
   if (isSidePanelOpen) {
     // Tell the side panel to close
     try {
@@ -18,6 +31,31 @@ chrome.action.onClicked.addListener((tab) => {
     chrome.sidePanel.open({ windowId: tab.windowId })
     isSidePanelOpen = true
     console.log('Side panel open')
+  }
+})
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+  const tab = sender.tab
+  console.log(JSON.stringify(message, '', 2))
+  if (message.from === 'content-script') {
+    if (message.message === 'content-loaded') {
+      chrome.scripting
+        .executeScript({
+          target: { tabId: tab.id },
+          files: ['resources/treeBuilder.js'],
+        })
+        .then(() => {
+          chrome.scripting
+            .executeScript({
+              target: { tabId: tab.id },
+              func: runTreeBuilder,
+            })
+            .then((tree) => {
+              console.log('Script out:', JSON.stringify(tree, '', 2))
+            })
+            .catch((error) => console.log(error))
+        })
+    }
   }
 })
 

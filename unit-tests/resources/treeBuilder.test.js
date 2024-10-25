@@ -1,9 +1,4 @@
-import {
-  isValidNode,
-  createNode,
-  buildHtmlTree,
-  htmlDocumentToTree,
-} from '../../publish/resources/treeBuilder'
+import tb from '../../publish/resources/treeBuilder'
 
 import fs from 'fs'
 import path from 'path'
@@ -14,34 +9,34 @@ describe('Tree builder', () => {
   describe('isValidNode', () => {
     it('should return true for valid tree element nodes', () => {
       const validElement = document.createElement('div')
-      expect(isValidNode(validElement)).toBe(true)
+      expect(tb.isValidNode(validElement)).toBe(true)
     })
 
     it('should return false for non-tree element nodes', () => {
       const invalidElement = document.createElement('nonexistenttag')
-      expect(isValidNode(invalidElement)).toBe(false)
+      expect(tb.isValidNode(invalidElement)).toBe(false)
     })
 
     it('should return false for non-element nodes (text node)', () => {
       const textNode = document.createTextNode('Sample Text')
-      expect(isValidNode(textNode)).toBe(false)
+      expect(tb.isValidNode(textNode)).toBe(false)
     })
 
     it('should return false for a comment node', () => {
       const commentNode = document.createComment('This is a comment')
-      expect(isValidNode(commentNode)).toBe(false)
+      expect(tb.isValidNode(commentNode)).toBe(false)
     })
 
     it('should ignore case of tag names', () => {
       const upperCaseTag = document.createElement('DIV')
-      expect(isValidNode(upperCaseTag)).toBe(true)
+      expect(tb.isValidNode(upperCaseTag)).toBe(true)
     })
   })
 
   describe('createNode', () => {
     it('should create a node with correct tag and id', () => {
       const element = document.createElement('div')
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.tag).toBe('div')
       expect(node.id).toBeDefined() // We only check if an ID exists.
@@ -51,7 +46,7 @@ describe('Tree builder', () => {
     it('should set the correct attribute if the element has one of the target attributes', () => {
       const element = document.createElement('div')
       element.id = 'test-id'
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.attribute).toBe('id: test-id')
     })
@@ -59,7 +54,7 @@ describe('Tree builder', () => {
     it('should not set the attribute field if no target attributes are present', () => {
       const element = document.createElement('div')
       element.setAttribute('data-custom', 'customValue')
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.attribute).toBe('')
     })
@@ -67,7 +62,7 @@ describe('Tree builder', () => {
     it('should add elementText for elements in treeElementsWithText', () => {
       const element = document.createElement('div')
       element.innerHTML = 'Sample Text'
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.elementText).toBe('Sample Text')
     })
@@ -75,14 +70,14 @@ describe('Tree builder', () => {
     it('should not add elementText for elements not in treeElementsWithText', () => {
       const element = document.createElement('img')
       element.innerText = 'Ignored Text'
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.elementText).toBe('')
     })
 
     it('should return a node with an empty children array', () => {
       const element = document.createElement('div')
-      const node = createNode(element)
+      const node = tb.createNode(element)
 
       expect(node.children).toEqual([])
     })
@@ -91,7 +86,7 @@ describe('Tree builder', () => {
   describe('buildHtmlTree', () => {
     it('should build a simple tree with no children', () => {
       const element = document.createElement('div')
-      const tree = buildHtmlTree(element)
+      const tree = tb.buildHtmlTree(element)
 
       expect(tree.tag).toBe('div')
       expect(tree.children).toHaveLength(0) // No children, so children should not exist
@@ -101,7 +96,7 @@ describe('Tree builder', () => {
       const parent = document.createElement('div')
       parent.innerHTML = '<span>Inside the span</span>'
 
-      const tree = buildHtmlTree(parent)
+      const tree = tb.buildHtmlTree(parent)
 
       expect(tree.tag).toBe('div')
       expect(tree.children.length).toBe(1) // One child
@@ -113,7 +108,7 @@ describe('Tree builder', () => {
       const parent = document.createElement('div')
       parent.innerHTML = '<span>Inside span</span><p>Inside p</p>'
 
-      const tree = buildHtmlTree(parent)
+      const tree = tb.buildHtmlTree(parent)
 
       expect(tree.tag).toBe('div')
       expect(tree.children.length).toBe(2) // Two children
@@ -126,7 +121,7 @@ describe('Tree builder', () => {
       parent.innerHTML =
         '<invalidElement>Inside invalid element</invalidElement><span>Inside span</span>'
 
-      const tree = buildHtmlTree(parent)
+      const tree = tb.buildHtmlTree(parent)
 
       expect(tree.tag).toBe('div')
       expect(tree.children.length).toBe(1) // Only one valid child
@@ -138,7 +133,7 @@ describe('Tree builder', () => {
       parent.innerHTML =
         '<script>Beautiful script</script><span>Inside span</span>'
 
-      const tree = buildHtmlTree(parent)
+      const tree = tb.buildHtmlTree(parent)
 
       expect(tree.tag).toBe('div')
       expect(tree.children.length).toBe(1) // Script is ignored
@@ -150,7 +145,7 @@ describe('Tree builder', () => {
       parent.innerHTML =
         '<p>Some text in p <span>And some text <a href="mylink">and a link</a>in span</span></p>'
 
-      const tree = buildHtmlTree(parent)
+      const tree = tb.buildHtmlTree(parent)
 
       expect(tree.tag).toBe('div')
       expect(tree.children.length).toBe(1)
@@ -194,7 +189,7 @@ describe('Tree builder', () => {
 
       const parser = new DOMParser()
       const nodeDocument = parser.parseFromString(htmlContent, 'text/html')
-      result = htmlDocumentToTree(nodeDocument)
+      result = tb.htmlDocumentToTree(nodeDocument)
     })
 
     it('should parse the document and return a valid tree structure', () => {

@@ -1,4 +1,8 @@
-import { simpleUid } from './utils'
+const simpleUid = function () {
+  const datePart = Date.now().toString(36)
+  const randomPart = Math.random().toString(36).substring(2, 10)
+  return (datePart + randomPart).substring(0, 16)
+}
 
 const treeElements = [
   'a',
@@ -118,79 +122,86 @@ const isValidElement = (node) => {
   return node.nodeType === 1
 }
 
-export const isValidNode = (node) => {
-  return isValidElement(node)
-    ? treeElements.includes(node.tagName.toLowerCase())
-    : false
-}
-
 const matchFirstAttribute = (attributes, matches) => {
   return attributes.find((attr) => matches.includes(attr))
 }
 
-export const createNode = (element) => {
-  const id = simpleUid()
+const treeBuilder = {
+  isValidNode: (node) => {
+    return isValidElement(node)
+      ? treeElements.includes(node.tagName.toLowerCase())
+      : false
+  },
+  createNode: (element) => {
+    const id = simpleUid()
 
-  element.setAttribute(`data-${chrome.runtime.id}`, id)
-  const node = {
-    tag: element.tagName.toLowerCase(),
-    id: id,
-    attribute: '',
-    elementText: '',
-    children: [],
-  }
+    element.setAttribute(`data-${chrome.runtime.id}`, id)
+    const node = {
+      tag: element.tagName.toLowerCase(),
+      id: id,
+      attribute: '',
+      elementText: '',
+      children: [],
+    }
 
-  // Add text for selected attributes, and show attribute name
-  const match = matchFirstAttribute(attributes, element.getAttributeNames())
-  if (match) {
-    node.attribute = `${match}: ${element.getAttribute(match)}`
-  }
+    // Add text for selected attributes, and show attribute name
+    const match = matchFirstAttribute(attributes, element.getAttributeNames())
+    if (match) {
+      node.attribute = `${match}: ${element.getAttribute(match)}`
+    }
 
-  // Add text for selected elements
-  const includeText = treeElementsWithText.includes(
-    element.nodeName.toLowerCase()
-  )
-  if (includeText) {
-    node.elementText = `${element.textContent}`
-  }
+    // Add text for selected elements
+    const includeText = treeElementsWithText.includes(
+      element.nodeName.toLowerCase()
+    )
+    if (includeText) {
+      node.elementText = `${element.textContent}`
+    }
 
-  // Return the node
-  return node
-}
+    // Return the node
+    return node
+  },
+  buildHtmlTree: (element) => {
+    if (element.tagName.toLowerCase() !== 'script') {
+      const node = treeBuilder.createNode(element)
 
-export const buildHtmlTree = (element) => {
-  if (element.tagName.toLowerCase() !== 'script') {
-    const node = createNode(element)
+      // Recursively process each child element
+      const children = element.children
+      for (let child of children) {
+        if (treeBuilder.isValidNode(child)) {
+          // Only process elements (ignore text, comments, scripts, etc.)
+          const childTree = treeBuilder.buildHtmlTree(child)
+          if (childTree) node.children.push(childTree)
+        }
+      }
+      return node
+    }
+  },
+  htmlDocumentToTree: (nodeDocument) => {
+    console.log('Into htmlDocumentToTree')
+    const _document = nodeDocument || document
 
-    // Recursively process each child element
-    const children = element.children
-    for (let child of children) {
-      if (isValidNode(child)) {
-        // Only process elements (ignore text, comments, scripts, etc.)
-        const childTree = buildHtmlTree(child)
-        if (childTree) node.children.push(childTree)
+    // Initialize an empty array to store the parsed elements
+    const treeStructure = []
+
+    // Get all elements in the document
+    const rootElements = Array.from(_document.children)
+
+    // Process each root element
+    for (let element of rootElements) {
+      const tree = treeBuilder.buildHtmlTree(element)
+      if (tree) {
+        treeStructure.push(tree)
       }
     }
-    return node
-  }
+
+    return treeStructure
+  },
 }
 
-export const htmlDocumentToTree = (nodeDocument) => {
-  const _document = nodeDocument || document
-
-  // Initialize an empty array to store the parsed elements
-  const treeStructure = []
-
-  // Get all elements in the document
-  const rootElements = Array.from(_document.children)
-
-  // Process each root element
-  for (let element of rootElements) {
-    const tree = buildHtmlTree(element)
-    if (tree) {
-      treeStructure.push(tree)
-    }
-  }
-
-  return treeStructure
+// Export `treeBuilder` for testing environments
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = treeBuilder
+} else {
+  window.treeBuilder = treeBuilder
 }
