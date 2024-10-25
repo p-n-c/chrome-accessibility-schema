@@ -1,8 +1,7 @@
-const simpleUid = function () {
-  const datePart = Date.now().toString(36)
-  const randomPart = Math.random().toString(36).substring(2, 10)
-  return (datePart + randomPart).substring(0, 16)
-}
+const { simpleUid } =
+  typeof module !== 'undefined' && module.exports
+    ? require('./utils')
+    : window.utils
 
 const treeElements = [
   'a',
@@ -178,7 +177,6 @@ const treeBuilder = {
     }
   },
   htmlDocumentToTree: (nodeDocument) => {
-    console.log('Into htmlDocumentToTree')
     const _document = nodeDocument || document
 
     // Initialize an empty array to store the parsed elements
@@ -202,6 +200,4 @@ const treeBuilder = {
 // Export `treeBuilder` for testing environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = treeBuilder
-} else {
-  window.treeBuilder = treeBuilder
 }

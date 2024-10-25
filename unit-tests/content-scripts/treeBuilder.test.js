@@ -1,4 +1,4 @@
-import tb from '../../publish/resources/treeBuilder'
+import tb from '../../publish/content-scripts/treeBuilder'
 
 import fs from 'fs'
 import path from 'path'
@@ -170,7 +170,6 @@ describe('Tree builder', () => {
         }
       } catch (error) {
         console.log(error)
-        console.log(JSON.stringify(rootNode, '', 2))
       }
       return matchingNodes
     }
@@ -182,7 +181,7 @@ describe('Tree builder', () => {
       const filePath = path.join(
         __dirname,
         'unit-tests',
-        'resources',
+        'content-scripts',
         'welcome.html'
       )
       const htmlContent = fs.readFileSync(filePath, 'utf-8')
@@ -252,11 +251,9 @@ describe('Tree builder', () => {
       expect(mains).toHaveLength(1)
 
       const dls = findAllNodesWithTag(mains[0], 'dl')
-
       expect(dls).toBeDefined()
 
       const dts = findAllNodesWithTag(dls[0], 'dt')
-      console.log(dts)
       expect(dts.some((dt) => dt.elementText === 'Performance')).toBe(true)
     })
   })

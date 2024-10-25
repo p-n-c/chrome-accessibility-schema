@@ -1,12 +1,9 @@
-import {
-  htmlStringToDomElement,
-  simpleUid,
-} from '../../publish/resources/utils'
+import u from '../../publish/content-scripts/utils'
 
 describe('utils tests', () => {
   test('htmlStringToDomElement should convert HTML string to a DOM element', () => {
     const htmlString = '<div class="test-class">Hello, World!</div>'
-    const domElement = htmlStringToDomElement(htmlString)
+    const domElement = u.htmlStringToDomElement(htmlString)
 
     // Check that the returned element is a 'div'
     expect(domElement.firstChild.tagName).toBe('DIV')
@@ -19,6 +16,6 @@ describe('utils tests', () => {
   })
 
   test('simpleUid should return a string of length 16', () => {
-    expect(simpleUid()).toHaveLength(16)
+    expect(u.simpleUid()).toHaveLength(16)
   })
 })

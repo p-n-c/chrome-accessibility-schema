@@ -2,16 +2,9 @@ let isSidePanelOpen = false
 let sidePanelPort = null
 
 const runTreeBuilder = () => {
-  console.log('runTreeBuilder')
-
-  if (typeof window.treeBuilder === 'undefined') {
-    console.error('treeBuilder is not loaded.')
-  } else {
-    // Use treeBuilder here on a fully loaded DOM
-    const result = window.treeBuilder.htmlDocumentToTree()
-    console.log('treeBuilder result:', result)
-    return result
-  }
+  // Use treeBuilder here on a fully loaded DOM
+  const result = treeBuilder.htmlDocumentToTree()
+  return result
 }
 
 chrome.action.onClicked.addListener(async (tab) => {
@@ -36,25 +29,17 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 chrome.runtime.onMessage.addListener((message, sender) => {
   const tab = sender.tab
-  console.log(JSON.stringify(message, '', 2))
   if (message.from === 'content-script') {
     if (message.message === 'content-loaded') {
       chrome.scripting
         .executeScript({
           target: { tabId: tab.id },
-          files: ['resources/treeBuilder.js'],
+          func: runTreeBuilder,
         })
-        .then(() => {
-          chrome.scripting
-            .executeScript({
-              target: { tabId: tab.id },
-              func: runTreeBuilder,
-            })
-            .then((tree) => {
-              console.log('Script out:', JSON.stringify(tree, '', 2))
-            })
-            .catch((error) => console.log(error))
+        .then((tree) => {
+          console.log('Script out:', JSON.stringify(tree, '', 2))
         })
+        .catch((error) => console.log(error))
     }
   }
 })
