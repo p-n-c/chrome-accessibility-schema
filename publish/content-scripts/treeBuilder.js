@@ -1,7 +1,6 @@
+// Handle both node.js and browser environments
 const { simpleUid } =
-  typeof module !== 'undefined' && module.exports
-    ? require('./utils')
-    : window.utils
+  typeof module !== 'undefined' && module.exports ? require('./utils') : utils
 
 const treeElements = [
   'a',
@@ -197,7 +196,7 @@ const treeBuilder = {
   },
 }
 
-// Export `treeBuilder` for testing environments
+// Export `treeBuilder` for node.js environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = treeBuilder
 }

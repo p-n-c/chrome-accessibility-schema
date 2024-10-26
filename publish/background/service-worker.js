@@ -1,12 +1,6 @@
 let isSidePanelOpen = false
 let sidePanelPort = null
 
-const runTreeBuilder = () => {
-  // Use treeBuilder here on a fully loaded DOM
-  const result = treeBuilder.htmlDocumentToTree()
-  return result
-}
-
 chrome.action.onClicked.addListener(async (tab) => {
   if (isSidePanelOpen) {
     // Tell the side panel to close
@@ -61,3 +55,6 @@ chrome.runtime.onConnect.addListener((port) => {
     isSidePanelOpen = false
   })
 })
+
+// Content script injections
+const runTreeBuilder = () => htmlDocumentToTree()

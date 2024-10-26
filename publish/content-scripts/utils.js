@@ -18,9 +18,7 @@ const utils = {
   },
 }
 
-// Export `utils` for testing environments
+// Export `utils` for node.js environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = utils
-} else {
-  window.utils = utils
 }
