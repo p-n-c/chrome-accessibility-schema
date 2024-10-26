@@ -22,18 +22,24 @@ chrome.action.onClicked.addListener(async (tab) => {
 })
 
 chrome.runtime.onMessage.addListener((message, sender) => {
-  const tab = sender.tab
-  if (message.from === 'content-script') {
-    if (message.message === 'content-loaded') {
-      chrome.scripting
-        .executeScript({
-          target: { tabId: tab.id },
-          func: runTreeBuilder,
-        })
-        .then((tree) => {
-          console.log('Script out:', JSON.stringify(tree, '', 2))
-        })
-        .catch((error) => console.log(error))
+  if (isSidePanelOpen) {
+    const tab = sender.tab
+    if (message.from === 'content-script') {
+      if (message.message === 'content-loaded') {
+        chrome.scripting
+          .executeScript({
+            target: { tabId: tab.id },
+            func: runTreeBuilder,
+          })
+          .then((answers) => {
+            sidePanelPort.postMessage({
+              from: 'service-worker',
+              message: 'tree',
+              content: answers[0].result,
+            })
+          })
+          .catch((error) => console.log(error))
+      }
     }
   }
 })

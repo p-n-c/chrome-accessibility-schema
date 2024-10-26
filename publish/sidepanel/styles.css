@@ -1,3 +1,133 @@
 body {
-  display: inherit;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: white;
+}
+
+button {
+  border: 1px solid darkgray;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 10001;
+  font-size: 14px;
+}
+
+details,
+details div:first-child {
+  margin-top: 0.5rem;
+}
+
+details[open] > :not(summary) {
+  margin-left: 1rem;
+}
+
+details[open] {
+  position: relative;
+}
+
+details[open]::before {
+  content: '';
+  position: absolute;
+  top: 1em;
+  left: 0.25rem;
+  bottom: 0.25rem;
+  width: 0;
+  border-left: 1px dotted darkgrey;
+}
+
+#display-controls {
+  margin-top: 1rem;
+}
+
+#schema-content span.attribute,
+#schema-content span.element-text {
+  display: inline-block;
+  opacity: 0;
+  max-height: 1em;
+  min-width: 0;
+  max-width: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  overflow: hidden;
+  transition:
+    min-width 0.4s ease,
+    max-width 0.4s ease,
+    transform 0.3s ease 0.1s,
+    opacity 0.1s ease 0.3s;
+}
+
+body:has(#display-attribute:checked) #schema-content .attribute,
+body:has(#display-element-text:checked) #schema-content .element-text {
+  opacity: 1;
+  min-width: 1ch;
+  max-width: 50ch;
+  transform: scaleX(1);
+  transition:
+    min-width 0.3s ease 0.1s,
+    max-width 0.3s ease 0.1s,
+    transform 0.4s ease,
+    opacity 0.1s ease;
+}
+
+#schema-content details:last-child,
+details div:last-child {
+  margin-bottom: 0 !important;
+}
+
+#schema-content div div {
+  margin: 0.25rem;
+  padding: 0.5rem;
+  border: 1px dotted darkgray;
+  border-left: 0;
+  border-radius: 0.25rem;
+}
+
+#schema-content {
+  font-family: monospace;
+  font-size: 14px;
+  color: #333;
+  margin-top: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+::selection {
+  background-color: black;
+  color: white;
+}
+
+input[type='checkbox']:checked {
+  accent-color: black;
+}
+
+.attribute::before {
+  content: '| ';
+}
+
+.checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.checkbox-container input[type='checkbox'] {
+  margin-right: 0.3rem;
+}
+
+.element-text::before {
+  content: '> ';
+}
+
+.highlight-button {
+  color: black;
+}
+
+.top-content {
+  flex-shrink: 0;
 }
