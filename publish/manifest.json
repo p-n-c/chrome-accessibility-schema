@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "chrome-accessibility-schema",
   "version": "0.0.0.1",
-  "permissions": ["activeTab", "sidePanel", "scripting"],
+  "permissions": ["activeTab", "sidePanel", "scripting", "contextMenus"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "background": {
     "service_worker": "background/service-worker.js",

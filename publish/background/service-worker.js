@@ -21,28 +21,28 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 })
 
-chrome.runtime.onMessage.addListener((message, sender) => {
-  if (isSidePanelOpen) {
-    const tab = sender.tab
-    if (message.from === 'content-script') {
-      if (message.message === 'content-loaded') {
-        chrome.scripting
-          .executeScript({
-            target: { tabId: tab.id },
-            func: runTreeBuilder,
-          })
-          .then((answers) => {
-            sidePanelPort.postMessage({
-              from: 'service-worker',
-              message: 'tree',
-              content: answers[0].result,
-            })
-          })
-          .catch((error) => console.log(error))
-      }
-    }
-  }
-})
+// chrome.runtime.onMessage.addListener((message, sender) => {
+//   if (isSidePanelOpen) {
+//     const tab = sender.tab
+//     if (message.from === 'content-script') {
+//       if (message.message === 'content-loaded') {
+//         chrome.scripting
+//           .executeScript({
+//             target: { tabId: tab.id },
+//             func: runTreeBuilder,
+//           })
+//           .then((answers) => {
+//             sidePanelPort.postMessage({
+//               from: 'service-worker',
+//               message: 'tree',
+//               content: answers[0].result,
+//             })
+//           })
+//           .catch((error) => console.log(error))
+//       }
+//     }
+//   }
+// })
 
 chrome.runtime.onConnect.addListener((port) => {
   console.log('Connected to panel')
@@ -54,6 +54,47 @@ chrome.runtime.onConnect.addListener((port) => {
       message: 'Hello from the service worker',
     })
   }
+  sidePanelPort.onMessage.addListener((message) => {
+    if (message.from === 'side-panel') {
+      switch (message.message) {
+        case 'generate-schema':
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const tab = tabs[0]
+
+            // Create one-time listener for tab update
+            const onTabUpdate = (tabId, changeInfo, updatedTab) => {
+              // Only proceed if this is our tab and it's done loading
+              if (tabId === tab.id && changeInfo.status === 'complete') {
+                // Remove the listener since we only need it once
+                chrome.tabs.onUpdated.removeListener(onTabUpdate)
+
+                // Execute the script
+                chrome.scripting
+                  .executeScript({
+                    target: { tabId },
+                    func: runTreeBuilder,
+                  })
+                  .then((answers) => {
+                    sidePanelPort.postMessage({
+                      from: 'service-worker',
+                      message: 'tree',
+                      content: answers[0].result,
+                    })
+                  })
+                  .catch((error) => console.log(error))
+              }
+            }
+
+            // Add the listener before reloading
+            chrome.tabs.onUpdated.addListener(onTabUpdate)
+            // Reload the tab
+            chrome.tabs.reload(tab.id)
+          })
+          break
+      }
+    }
+  })
+
   // Side panel closed
   port.onDisconnect.addListener(() => {
     sidePanelPort = null
@@ -63,4 +104,7 @@ chrome.runtime.onConnect.addListener((port) => {
 })
 
 // Content script injections
-const runTreeBuilder = () => htmlDocumentToTree()
+const runTreeBuilder = () => {
+  console.log('Running htmlDocumentToTree')
+  return htmlDocumentToTree()
+}

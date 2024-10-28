@@ -45,6 +45,12 @@ details[open]::before {
   margin-top: 1rem;
 }
 
+#generate-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
 #schema-content span.attribute,
 #schema-content span.element-text {
   display: inline-block;
