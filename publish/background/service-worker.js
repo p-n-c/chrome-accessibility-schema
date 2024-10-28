@@ -1,5 +1,6 @@
 let isSidePanelOpen = false
 let sidePanelPort = null
+let schemaTab = null
 
 chrome.action.onClicked.addListener(async (tab) => {
   if (isSidePanelOpen) {
@@ -36,12 +37,12 @@ chrome.runtime.onConnect.addListener((port) => {
       switch (message.message) {
         case 'generate-schema':
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            const tab = tabs[0]
+            schemaTab = tabs[0]
 
             // Create one-time listener for tab update
             const onTabUpdate = (tabId, changeInfo, updatedTab) => {
               // Only proceed if this is our tab and it's done loading
-              if (tabId === tab.id && changeInfo.status === 'complete') {
+              if (tabId === schemaTab.id && changeInfo.status === 'complete') {
                 // Remove the listener since we only need it once
                 chrome.tabs.onUpdated.removeListener(onTabUpdate)
 
@@ -65,7 +66,15 @@ chrome.runtime.onConnect.addListener((port) => {
             // Add the listener before reloading
             chrome.tabs.onUpdated.addListener(onTabUpdate)
             // Reload the tab
-            chrome.tabs.reload(tab.id)
+            chrome.tabs.reload(schemaTab.id)
+          })
+          break
+        case 'highlight':
+          chrome.tabs.update(schemaTab.id, { active: true })
+          chrome.tabs.sendMessage(schemaTab.id, {
+            from: 'service-worker',
+            message: 'highlight',
+            elementId: message.elementId, // Match the case from side panel
           })
           break
       }
@@ -77,6 +86,7 @@ chrome.runtime.onConnect.addListener((port) => {
     sidePanelPort = null
     console.log('Side panel disconnected')
     isSidePanelOpen = false
+    schemaTab = null
   })
 })
 

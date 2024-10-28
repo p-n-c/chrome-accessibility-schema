@@ -130,8 +130,13 @@ input[type='checkbox']:checked {
   content: '> ';
 }
 
-.highlight-button {
+button.highlight-button {
   color: black;
+  background-color: white;
+  padding: 0 3px 3px;
+  font-size: 14px;
+  border-radius: 3px;
+  border: 2px solid darkgray;
 }
 
 .top-content {

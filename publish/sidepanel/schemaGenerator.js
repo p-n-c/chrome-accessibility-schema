@@ -6,7 +6,7 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' id='${tree.id}' class='highlight-button'>🖍</button>`
+    const button = `<button type='button' title='Highlight in page' id='${tree.id}' class='highlight-button'>⇦</button>`
     // Base case: if there are no children, return a div with just the tag name
 
     let nodeText = `<span class='tag'>${button} ${tree.tag}</span>`
@@ -31,7 +31,7 @@ const schemaGenerator = {
     }
 
     return `
-      <details>
+      <details id='${tree.id}'>
           <summary>${nodeText}</summary>
           ${childrenHtml}
       </details>

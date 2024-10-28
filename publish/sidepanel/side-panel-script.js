@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(message.content)
           displaySchema(schemaHtml.outerHTML)
+          const askForHighlight = (id) => {
+            port.postMessage({
+              from: 'side-panel',
+              message: 'highlight',
+              elementId: id,
+            })
+          }
+          document.querySelectorAll('.highlight-button').forEach((el) => {
+            el.addEventListener('click', (event) => {
+              askForHighlight(event.target.id)
+            })
+          })
           break
       }
     }
