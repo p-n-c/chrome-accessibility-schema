@@ -21,29 +21,6 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 })
 
-// chrome.runtime.onMessage.addListener((message, sender) => {
-//   if (isSidePanelOpen) {
-//     const tab = sender.tab
-//     if (message.from === 'content-script') {
-//       if (message.message === 'content-loaded') {
-//         chrome.scripting
-//           .executeScript({
-//             target: { tabId: tab.id },
-//             func: runTreeBuilder,
-//           })
-//           .then((answers) => {
-//             sidePanelPort.postMessage({
-//               from: 'service-worker',
-//               message: 'tree',
-//               content: answers[0].result,
-//             })
-//           })
-//           .catch((error) => console.log(error))
-//       }
-//     }
-//   }
-// })
-
 chrome.runtime.onConnect.addListener((port) => {
   console.log('Connected to panel')
   sidePanelPort = port
@@ -105,6 +82,5 @@ chrome.runtime.onConnect.addListener((port) => {
 
 // Content script injections
 const runTreeBuilder = () => {
-  console.log('Running htmlDocumentToTree')
   return htmlDocumentToTree()
 }

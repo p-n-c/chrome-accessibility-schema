@@ -76,10 +76,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
+  // Buttons
   document.getElementById('generate-schema').addEventListener('click', () => {
     port.postMessage({
       from: 'side-panel',
       message: 'generate-schema',
     })
   })
+
+  document
+    .getElementById('expand-schema')
+    .addEventListener('click', function () {
+      document
+        .querySelectorAll('details')
+        .forEach((details) => (details.open = true))
+    })
+
+  document
+    .getElementById('collapse-schema')
+    .addEventListener('click', function () {
+      document
+        .querySelectorAll('details')
+        .forEach((details) => (details.open = false))
+    })
 })
