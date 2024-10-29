@@ -1,8 +1,32 @@
+let DEBUG = true
+let debugUrl =
+  'https://p-n-c.github.io/website/accessibility/bad-test-card.html'
+
 let isSidePanelOpen = false
 let sidePanelPort = null
 let schemaTab = null
 
+chrome.runtime.onInstalled.addListener(() => {
+  if (DEBUG) {
+    // Handle refresh issues when debugging
+    chrome.tabs
+      .query({
+        url: debugUrl,
+      })
+      .then((tabs) => {
+        if (tabs.length === 0) {
+          chrome.tabs
+            .update({
+              url: debugUrl,
+            })
+            .then(() => chrome.runtime.reload())
+        }
+      })
+  }
+})
+
 chrome.action.onClicked.addListener(async (tab) => {
+  console.log(chrome.runtime.getManifest().version)
   if (isSidePanelOpen) {
     // Tell the side panel to close
     try {
@@ -16,6 +40,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   } else {
     // Open the side panel
+    chrome.sidePanel.setOptions({ enabled: true })
     chrome.sidePanel.open({ windowId: tab.windowId })
     isSidePanelOpen = true
     console.log('Side panel open')
@@ -60,6 +85,14 @@ chrome.runtime.onConnect.addListener((port) => {
                     })
                   })
                   .catch((error) => console.log(error))
+                chrome.scripting
+                  .executeScript({
+                    target: { tabId },
+                    func: runValidator,
+                  })
+                  .then((answers) => {
+                    console.log(JSON.stringify(answers[0].result, '', 2))
+                  })
               }
             }
 
@@ -85,6 +118,7 @@ chrome.runtime.onConnect.addListener((port) => {
   port.onDisconnect.addListener(() => {
     sidePanelPort = null
     console.log('Side panel disconnected')
+    chrome.sidePanel.setOptions({ enabled: false })
     isSidePanelOpen = false
     schemaTab = null
   })
@@ -92,5 +126,11 @@ chrome.runtime.onConnect.addListener((port) => {
 
 // Content script injections
 const runTreeBuilder = () => {
-  return htmlDocumentToTree()
+  return treeBuilder.htmlDocumentToTree()
+}
+
+const runValidator = () => {
+  console.log('Instantiating the validator 5')
+  const validator = new HTMLValidator(rulesConfig, ruleHandlers)
+  return validator.validate()
 }

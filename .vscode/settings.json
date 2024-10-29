@@ -10,5 +10,7 @@
   },
   "editor.formatOnSave": true,
   "editor.formatOnType": false,
-  "jest.runMode": "watch"
+  "jest.runMode": "watch",
+  "debug.chrome.cleanUp": true,
+  "debug.chrome.useDetachedDebugger": true
 }
