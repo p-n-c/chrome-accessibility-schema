@@ -3,6 +3,7 @@ class HTMLValidator {
     this.rules = rules
     this.handlers = handlers
     this.results = []
+    this.dataId = `data-${chrome.runtime.id}`
 
     // All the validation functions in one object for easy iteration
     this.validationFunctions = {
@@ -178,7 +179,7 @@ class HTMLValidator {
 
   addResult(element, message, type = 'error', details = {}) {
     this.results.push({
-      element,
+      element: element.getAttribute(this.dataId),
       message: typeof message === 'function' ? message(element) : message,
       type,
       details,

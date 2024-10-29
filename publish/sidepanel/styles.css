@@ -52,7 +52,8 @@ details[open]::before {
 }
 
 #schema-content span.attribute,
-#schema-content span.element-text {
+#schema-content span.element-text,
+#schema-content span.validation {
   display: inline-block;
   opacity: 0;
   max-height: 1em;
@@ -69,7 +70,8 @@ details[open]::before {
 }
 
 body:has(#display-attribute:checked) #schema-content .attribute,
-body:has(#display-element-text:checked) #schema-content .element-text {
+body:has(#display-element-text:checked) #schema-content .element-text,
+body:has(#display-validation:checked) #schema-content .validation {
   opacity: 1;
   min-width: 1ch;
   max-width: 50ch;
@@ -128,6 +130,10 @@ input[type='checkbox']:checked {
 
 .element-text::before {
   content: '> ';
+}
+
+.validation::before {
+  content: '⊂ ';
 }
 
 button.highlight-button {

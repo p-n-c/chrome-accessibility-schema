@@ -6,7 +6,7 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' id='${tree.id}' class='highlight-button'>⇦</button>`
+    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>←</button>`
     // Base case: if there are no children, return a div with just the tag name
 
     let nodeText = `<span class='tag'>${button} ${tree.tag}</span>`
@@ -19,9 +19,11 @@ const schemaGenerator = {
       nodeText += ` <span class='element-text hidden'>${tree.elementText}</span>`
     }
 
+    nodeText += ` <span class='validation hidden'>✓</span>`
+
     // Base case: if there are no children, return a span with just the tag name
     if (children?.length === 0) {
-      return `<div>${nodeText}</div>`
+      return `<div id='${tree.id}'>${nodeText}</div>`
     }
 
     // Recursive case: create a details element with a summary and nested details
@@ -35,7 +37,7 @@ const schemaGenerator = {
           <summary>${nodeText}</summary>
           ${childrenHtml}
       </details>
-  `
+    `
   },
 
   generateSchemaHtml: (treeStructure) => {

@@ -47,8 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           document.querySelectorAll('.highlight-button').forEach((el) => {
             el.addEventListener('click', (event) => {
-              askForHighlight(event.target.id)
+              askForHighlight(event.target.getAttribute('data-treeid'))
             })
+          })
+          break
+        case 'validation':
+          message.content.forEach((item) => {
+            const selector = `#${item.element} span.validation`
+            document.querySelector(selector).innerHTML = item.message
           })
           break
       }

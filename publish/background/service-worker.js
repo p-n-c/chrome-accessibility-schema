@@ -1,4 +1,4 @@
-let DEBUG = true
+let DEBUG = false
 let debugUrl =
   'https://p-n-c.github.io/website/accessibility/bad-test-card.html'
 
@@ -91,7 +91,11 @@ chrome.runtime.onConnect.addListener((port) => {
                     func: runValidator,
                   })
                   .then((answers) => {
-                    console.log(JSON.stringify(answers[0].result, '', 2))
+                    sidePanelPort.postMessage({
+                      from: 'service-worker',
+                      message: 'validation',
+                      content: answers[0].result,
+                    })
                   })
               }
             }
