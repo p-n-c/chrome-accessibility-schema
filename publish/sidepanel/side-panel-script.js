@@ -1,5 +1,7 @@
 import './schemaGenerator.js'
 
+let timeoutID = undefined
+
 function displaySchema(schemaHtml) {
   const schemaContainer = document.getElementById('schema-content')
   schemaContainer.innerHTML = `${schemaHtml}`
@@ -21,12 +23,19 @@ function openOrReloadWindow(url, windowName) {
   }
 }
 
+function closeMe() {
+  if (typeof timeoutID === 'number') {
+    clearTimeout(timeoutID)
+  }
+  window.close()
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Establish a connection to the service worker
   let port = chrome.runtime.connect({ name: 'panel-connection' })
-  // If disconnection, attempt to reconnect
   port.onDisconnect.addListener(() => {
-    document.querySelector('main').classList.add('disabled')
+    document.querySelector('body').classList.add('disabled')
+    timeoutID = setTimeout(closeMe, 10000)
   })
   // Listen for messages from the service worker
   port.onMessage.addListener((message) => {
@@ -35,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       switch (message.message) {
         case 'close':
           // Closing the side panel
-          window.close()
+          closeMe()
           break
         case 'tree':
           // Inject the tree into the sidepanel
@@ -99,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Buttons
   document.getElementById('generate-schema').addEventListener('click', () => {
-    document.querySelector('main').classList.remove('disabled')
     port.postMessage({
       from: 'side-panel',
       message: 'generate-schema',
