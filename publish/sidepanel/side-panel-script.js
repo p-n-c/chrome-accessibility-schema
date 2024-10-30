@@ -23,8 +23,11 @@ function openOrReloadWindow(url, windowName) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Establish a connection to the service worker
-  const port = chrome.runtime.connect({ name: 'panel-connection' })
-
+  let port = chrome.runtime.connect({ name: 'panel-connection' })
+  // If disconnection, attempt to reconnect
+  port.onDisconnect.addListener(() => {
+    document.querySelector('main').classList.add('disabled')
+  })
   // Listen for messages from the service worker
   port.onMessage.addListener((message) => {
     if (message.from === 'service-worker') {
@@ -96,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Buttons
   document.getElementById('generate-schema').addEventListener('click', () => {
+    document.querySelector('main').classList.remove('disabled')
     port.postMessage({
       from: 'side-panel',
       message: 'generate-schema',

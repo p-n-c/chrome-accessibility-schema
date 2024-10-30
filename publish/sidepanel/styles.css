@@ -20,6 +20,7 @@ main {
   flex: 1;
   overflow: auto;
   min-height: 0;
+  position: relative;
 }
 
 header,
@@ -155,12 +156,31 @@ input[type='checkbox']:checked {
   content: '> ';
 }
 
-#generate-button {
-  padding: calc(var(--d) * 4) 0;
+.overlay {
+  display: none;
+  inset: 0;
+  position: absolute;
+  background: rgb(255 255 255 / 90%);
+  z-index: 1000;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+main.disabled {
+  overflow: hidden;
+}
+
+main.disabled .overlay {
+  display: inline-block;
 }
 
 .validation::before {
   content: '⊂ ';
+}
+
+#generate-button {
+  padding: calc(var(--d) * 4) 0;
 }
 
 button.highlight-button {

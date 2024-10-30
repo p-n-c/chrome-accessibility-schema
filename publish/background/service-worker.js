@@ -1,4 +1,4 @@
-let DEBUG = false
+let DEBUG = true
 let debugUrl =
   'https://p-n-c.github.io/website/accessibility/bad-test-card.html'
 
