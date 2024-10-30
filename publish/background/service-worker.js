@@ -120,9 +120,9 @@ chrome.runtime.onConnect.addListener((port) => {
 
   // Side panel closed
   port.onDisconnect.addListener(() => {
+    chrome.sidePanel.setOptions({ enabled: false })
     sidePanelPort = null
     console.log('Side panel disconnected')
-    chrome.sidePanel.setOptions({ enabled: false })
     isSidePanelOpen = false
     schemaTab = null
   })
@@ -134,7 +134,7 @@ const runTreeBuilder = () => {
 }
 
 const runValidator = () => {
-  console.log('Instantiating the validator 5')
+  console.log('Instantiating the validator')
   const validator = new HTMLValidator(rulesConfig, ruleHandlers)
   return validator.validate()
 }

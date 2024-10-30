@@ -158,7 +158,6 @@ input[type='checkbox']:checked {
 
 .overlay {
   display: none;
-  inset: 0;
   position: absolute;
   background: rgb(255 255 255 / 90%);
   z-index: 1000;
@@ -167,12 +166,14 @@ input[type='checkbox']:checked {
   padding: 20px;
 }
 
-main.disabled {
+body.disabled {
   overflow: hidden;
+  cursor: not-allowed;
 }
 
-main.disabled .overlay {
+body.disabled .overlay {
   display: inline-block;
+  inset: 0;
 }
 
 .validation::before {
