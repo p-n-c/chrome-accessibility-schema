@@ -9,32 +9,43 @@
   <!doctype html>
 
   <body>
-    <div class="top-content">
-      <h1>HTML Schema</h1>
-      <h2 id="title-content">Page:</h2>
+    <header>
+      <h1>Accessibility Schema Validation</h1>
+      <div>Analyses the Web page schema for accessibility issues</div>
       <div id="generate-button">
         <button id="generate-schema">Generate Schema</button>
       </div>
-      <div id="buttons">
-        <button id="expand-schema">Expand</button>
-        <button id="collapse-schema">Collapse</button>
+      <div class="controls">
+        <h2 id="title-content">Page:</h2>
+        <div id="buttons">
+          <button id="expand-schema">Expand</button>
+          <button id="collapse-schema">Collapse</button>
+        </div>
+        <div id="display-controls">
+          <span class="checkbox-container">
+            <input type="checkbox" id="display-attribute" />
+            <label for="display-attribute">Attributes</label>
+          </span>
+          <span class="checkbox-container">
+            <input type="checkbox" id="display-element-text" />
+            <label for="display-element-text">Text</label>
+          </span>
+          <span class="checkbox-container">
+            <input type="checkbox" id="display-validation" />
+            <label for="display-validation">Accessibility</label>
+          </span>
+        </div>
       </div>
-      <div id="display-controls">
-        <span class="checkbox-container">
-          <input type="checkbox" id="display-attribute" />
-          <label for="display-attribute">Attributes</label>
-        </span>
-        <span class="checkbox-container">
-          <input type="checkbox" id="display-element-text" />
-          <label for="display-element-text">Text</label>
-        </span>
-        <span class="checkbox-container">
-          <input type="checkbox" id="display-validation" />
-          <label for="display-validation">Accessibility</label>
-        </span>
-      </div>
-    </div>
-    <div id="schema-content"></div>
+    </header>
+    <main>
+      <div id="schema-content"></div>
+    </main>
+    <footer>
+      Accessibility schema validation by &nbsp;
+      <a href="https://p-n-c.github.io/website/" target="_blank"
+        >People & Code</a
+      >
+    </footer>
     <script type="module" src="side-panel-script.js"></script>
   </body>
 </html>
