@@ -1,13 +1,40 @@
-<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Schema Validation by People and Code</title>
-        </head>
-        <body>
-            <h1>Schema Validation by People and Code</h1>
-        </body>
-            <div id="message">Message goes here…</div>
-            <script src="side-panel-script.js"></script>
-        </html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schema Accessibility Analysis by People and Code</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <!doctype html>
+
+  <body>
+    <div class="top-content">
+      <h1>HTML Schema</h1>
+      <h2 id="title-content">Page:</h2>
+      <div id="generate-button">
+        <button id="generate-schema">Generate Schema</button>
+      </div>
+      <div id="buttons">
+        <button id="expand-schema">Expand</button>
+        <button id="collapse-schema">Collapse</button>
+      </div>
+      <div id="display-controls">
+        <span class="checkbox-container">
+          <input type="checkbox" id="display-attribute" />
+          <label for="display-attribute">Attributes</label>
+        </span>
+        <span class="checkbox-container">
+          <input type="checkbox" id="display-element-text" />
+          <label for="display-element-text">Text</label>
+        </span>
+        <span class="checkbox-container">
+          <input type="checkbox" id="display-validation" />
+          <label for="display-validation">Accessibility</label>
+        </span>
+      </div>
+    </div>
+    <div id="schema-content"></div>
+    <script type="module" src="side-panel-script.js"></script>
+  </body>
+</html>
