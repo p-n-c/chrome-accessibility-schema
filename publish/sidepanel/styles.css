@@ -156,26 +156,6 @@ input[type='checkbox']:checked {
   content: '> ';
 }
 
-.overlay {
-  display: none;
-  position: absolute;
-  background: rgb(255 255 255 / 90%);
-  z-index: 1000;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
-}
-
-body.disabled {
-  overflow: hidden;
-  cursor: not-allowed;
-}
-
-body.disabled .overlay {
-  display: inline-block;
-  inset: 0;
-}
-
 .validation::before {
   content: '⊂ ';
 }
