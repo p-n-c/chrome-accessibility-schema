@@ -21,25 +21,41 @@ function openOrReloadWindow(url, windowName) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Establish a connection to the service worker
-  const port = chrome.runtime.connect({ name: 'panel-connection' })
+function closeMe() {
+  window.close()
+}
 
+function expandSchema() {
+  document
+    .querySelectorAll('details')
+    .forEach((details) => (details.open = true))
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Signal opening to service-worker to trigger analysis of current page
+  chrome.runtime.sendMessage({
+    from: 'side-panel',
+    message: 'loaded',
+  })
   // Listen for messages from the service worker
-  port.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message) => {
+    console.log(`Message received from ${message.from}: ${message.message}`)
     if (message.from === 'service-worker') {
-      console.log('Message received from service worker:', message.message)
       switch (message.message) {
-        case 'close':
+        case 'close-side-panel':
           // Closing the side panel
-          window.close()
+          closeMe()
+          break
+        case 'title':
+          document.getElementById('page-title').innerHTML = message.content
           break
         case 'tree':
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(message.content)
           displaySchema(schemaHtml.outerHTML)
+          expandSchema()
           const askForHighlight = (id) => {
-            port.postMessage({
+            chrome.runtime.sendMessage({
               from: 'side-panel',
               message: 'highlight',
               elementId: id,
@@ -47,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           document.querySelectorAll('.highlight-button').forEach((el) => {
             el.addEventListener('click', (event) => {
+              if (event.target.classList.contains('highlighter')) {
+                event.target.classList.remove('highlighter')
+              } else {
+                document
+                  .querySelector('.highlighter')
+                  ?.classList.remove('highlighter')
+                event.target.classList.add('highlighter')
+              }
               askForHighlight(event.target.getAttribute('data-treeid'))
             })
           })
@@ -57,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector(selector).innerHTML = item.message
           })
           break
+        case 'reset-schema':
+          document.getElementById('schema-content').innerHTML =
+            'No schema to display, please load a valid page.'
       }
     }
   })
@@ -94,21 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  // Buttons
-  document.getElementById('generate-schema').addEventListener('click', () => {
-    port.postMessage({
-      from: 'side-panel',
-      message: 'generate-schema',
-    })
-  })
-
   document
     .getElementById('expand-schema')
-    .addEventListener('click', function () {
-      document
-        .querySelectorAll('details')
-        .forEach((details) => (details.open = true))
-    })
+    .addEventListener('click', expandSchema)
 
   document
     .getElementById('collapse-schema')
@@ -117,4 +132,17 @@ document.addEventListener('DOMContentLoaded', () => {
         .querySelectorAll('details')
         .forEach((details) => (details.open = false))
     })
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      chrome.runtime.sendMessage({
+        from: 'side-panel',
+        message: 'closing',
+      })
+    }
+  })
 })
+
+// Classic mode, for Dan
+// prettier-ignore
+window.activateClassicMode=(function(){const styles=`.cm-overlay{display:none;position:absolute;background:rgb(255 255 255 / 90%);z-index:1000;justify-content:center;text-align:center;padding:20px;}.cm-disabled{overflow:hidden;cursor:not-allowed;}.cm-disabled .cm-overlay{display:inline-block;inset:0;}`;const overlay=`<div class="cm-overlay">Connection with page lost.<br><br>Side panel closing soon</div>`;return function(){const styleSheet=document.createElement('style');styleSheet.id='classic-mode-styles';styleSheet.textContent=styles;document.head.appendChild(styleSheet);document.body.insertAdjacentHTML('afterbegin',overlay);console.log('%c⚠️ Classic Mode Activated ⚠️',`color:white;font-size:20px;padding:10px;font-weight:bold;background:#9932CC;animation:backgroundPulse 1s infinite;@keyframes backgroundPulse{50%{background:#7FFF00;}}`);setTimeout(()=>{document.querySelector('body').classList.add('cm-disabled');setTimeout(()=>window.close(),10000)},Math.random(5000)+5000)}})();

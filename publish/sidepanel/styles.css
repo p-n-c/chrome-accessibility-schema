@@ -1,12 +1,44 @@
+:root {
+  --bg-colour: white;
+  --fg-colour: black;
+  --line-colour: lightgrey;
+  --accent-colour: orange;
+  --up: red;
+  --down: green;
+  --d: 0.25rem;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  height: 100vh;
+  padding: calc(var(--d) * 4);
+  height: calc(100vh - var(--d) * 8);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: white;
+}
+
+main {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  position: relative;
+}
+
+header,
+footer {
+  display: block;
+  width: 100%;
+  background-color: var(--bg-colour);
+  z-index: 10;
+  padding: calc(var(--d) * 4) 0;
+  position: sticky;
+}
+
+header {
+  top: 0;
+}
+
+footer {
+  bottom: 0;
 }
 
 button {
@@ -43,12 +75,6 @@ details[open]::before {
 
 #display-controls {
   margin-top: 1rem;
-}
-
-#generate-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
 }
 
 #schema-content span.attribute,
@@ -97,12 +123,10 @@ details div:last-child {
 }
 
 #schema-content {
+  position: relative;
   font-family: monospace;
   font-size: 14px;
   color: #333;
-  margin-top: 20px;
-  flex-grow: 1;
-  overflow-y: auto;
 }
 
 ::selection {
@@ -136,6 +160,11 @@ input[type='checkbox']:checked {
   content: '⊂ ';
 }
 
+.highlighter {
+  color: white !important;
+  background-color: black !important;
+}
+
 button.highlight-button {
   color: black;
   background-color: white;
@@ -145,6 +174,6 @@ button.highlight-button {
   border: 2px solid darkgray;
 }
 
-.top-content {
-  flex-shrink: 0;
+#page-title {
+  font-weight: normal;
 }
