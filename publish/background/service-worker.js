@@ -2,6 +2,9 @@ let DEBUG = true
 let debugUrl =
   'https://p-n-c.github.io/website/accessibility/bad-test-card.html'
 
+// Schema tab
+let schemaTabId = undefined
+
 const closeSidePanel = async () => {
   console.log('Sending close message to side panel')
   chrome.runtime
@@ -9,44 +12,60 @@ const closeSidePanel = async () => {
       from: 'service-worker',
       message: 'close-side-panel',
     })
+    .then(() => (schemaTabId = undefined))
     .catch((error) => console.error(error))
 }
 
 const scanCurrentPage = async () => {
   chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    const tabId = tabs[0].id
+    chrome.runtime.sendMessage({
+      from: 'service-worker',
+      message: 'title',
+      content: tabs[0].title,
+    })
 
-    // Execute the script
-    chrome.scripting
-      .executeScript({
-        target: { tabId },
-        func: runTreeBuilder,
+    // Only handle certain pages
+    const permittedProtocols = ['http:', 'https:']
+    const tabProtocol = new URL(tabs[0].url)?.protocol
+    if (permittedProtocols.includes(tabProtocol)) {
+      schemaTabId = tabs[0].id
+      // Execute the script
+      chrome.scripting
+        .executeScript({
+          target: { tabId: schemaTabId },
+          func: runTreeBuilder,
+        })
+        .then((answers) => {
+          chrome.runtime
+            .sendMessage({
+              from: 'service-worker',
+              message: 'tree',
+              content: answers[0].result,
+            })
+            .catch((error) => console.log(error))
+        })
+        .catch((error) => console.log(error))
+      chrome.scripting
+        .executeScript({
+          target: { tabId: schemaTabId },
+          func: runValidator,
+        })
+        .then((answers) => {
+          chrome.runtime
+            .sendMessage({
+              from: 'service-worker',
+              message: 'validation',
+              content: answers[0].result,
+            })
+            .catch((error) => console.log(error))
+        })
+        .catch((error) => console.log(error))
+    } else {
+      chrome.runtime.sendMessage({
+        from: 'service-worker',
+        message: 'reset-schema',
       })
-      .then((answers) => {
-        chrome.runtime
-          .sendMessage({
-            from: 'service-worker',
-            message: 'tree',
-            content: answers[0].result,
-          })
-          .catch((error) => console.log(error))
-      })
-      .catch((error) => console.log(error))
-    chrome.scripting
-      .executeScript({
-        target: { tabId },
-        func: runValidator,
-      })
-      .then((answers) => {
-        chrome.runtime
-          .sendMessage({
-            from: 'service-worker',
-            message: 'validation',
-            content: answers[0].result,
-          })
-          .catch((error) => console.log(error))
-      })
-      .catch((error) => console.log(error))
+    }
   })
 }
 
@@ -71,7 +90,6 @@ chrome.runtime.onInstalled.addListener(() => {
   }
 
   chrome.action.onClicked.addListener(async (tab) => {
-    console.log(isSidePanelOpen)
     if (isSidePanelOpen) {
       closeSidePanel()
       // isSidePanelOpen managed when receiving the `closing` message
@@ -81,6 +99,14 @@ chrome.runtime.onInstalled.addListener(() => {
       })
     }
   })
+})
+
+chrome.tabs.onUpdated.addListener(() => {
+  scanCurrentPage()
+})
+
+chrome.tabs.onActivated.addListener(() => {
+  closeSidePanel()
 })
 
 chrome.runtime.onMessage.addListener((message) => {

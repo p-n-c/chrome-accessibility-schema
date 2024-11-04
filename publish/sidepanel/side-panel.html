@@ -13,7 +13,7 @@
       <h1>Accessibility Schema Validation</h1>
       <div>Analyses the Web page schema for accessibility issues</div>
       <div class="controls">
-        <h2 id="title-content">Page:</h2>
+        <h2 id="title-content">Page: <span id="page-title"></span></h2>
         <div id="buttons">
           <button id="expand-schema">Expand</button>
           <button id="collapse-schema">Collapse</button>
@@ -35,7 +35,9 @@
       </div>
     </header>
     <main>
-      <div id="schema-content"></div>
+      <div id="schema-content">
+        No schema to display, please load a valid page.
+      </div>
     </main>
     <footer>
       Accessibility schema validation by &nbsp;

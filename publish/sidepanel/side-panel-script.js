@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
           // Closing the side panel
           closeMe()
           break
+        case 'title':
+          document.getElementById('page-title').innerHTML = message.content
+          break
         case 'tree':
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(message.content)
@@ -70,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector(selector).innerHTML = item.message
           })
           break
+        case 'reset-schema':
+          document.getElementById('schema-content').innerHTML =
+            'No schema to display, please load a valid page.'
       }
     }
   })

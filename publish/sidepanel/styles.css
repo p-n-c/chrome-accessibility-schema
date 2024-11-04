@@ -168,3 +168,7 @@ button.highlight-button {
   border-radius: 3px;
   border: 2px solid darkgray;
 }
+
+#page-title {
+  font-weight: normal;
+}
