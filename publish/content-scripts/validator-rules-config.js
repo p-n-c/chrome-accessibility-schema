@@ -305,7 +305,7 @@ const rulesConfig = {
               'aria-activedescendant',
             ].find((attr) => {
               const ids = element.getAttribute(attr)?.split(/\s+/)
-              return ids && !ids.every((id) => document.getElementById(id))
+              return !!ids && !ids.every((id) => document.getElementById(id))
             })
             return `${invalidAttr} must reference existing ID(s)`
           },
@@ -442,10 +442,10 @@ const rulesConfig = {
       type: 'documentProperties',
       rules: [
         {
-          selector: 'html',
-          validate: () => {
-            const title = document.title
-            return title && title.trim().length > 0
+          selector: 'title',
+          validate: (element) => {
+            const title = element.innerHTML
+            return !!title && title.trim().length > 0
           },
           message: 'Document must have a non-empty title',
         },
@@ -453,7 +453,8 @@ const rulesConfig = {
           selector: 'html',
           validate: (element) => {
             const lang = element.getAttribute('lang')
-            return lang && /^[a-zA-Z]{2,3}(-[a-zA-Z]{2,3})?$/.test(lang)
+            console.log(lang)
+            return !!lang && /^[a-zA-Z]{2,3}(-[a-zA-Z]{2,3})?$/.test(lang)
           },
           message: 'Document must have a valid language code',
         },
@@ -481,7 +482,7 @@ const rulesConfig = {
           validate: () => {
             const meta = document.querySelector('meta[name="description"]')
             const content = meta?.getAttribute('content')
-            return content && content.length >= 50 && content.length <= 160
+            return !!content && content.length >= 50 && content.length <= 160
           },
           message: (element) => {
             const meta = document.querySelector('meta[name="description"]')

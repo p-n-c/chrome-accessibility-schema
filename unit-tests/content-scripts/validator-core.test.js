@@ -41,7 +41,6 @@ describe('HTMLValidator', () => {
       <a href="  ">Whitespace href</a>
     `
     let results = validator.validate('element', 'attributePresence')
-    console.log(JSON.stringify(results, '', 2))
     expect(results.length).toBe(3)
     results.forEach((result) => {
       expect(result.message).toBe('Links must have non-empty href attribute')

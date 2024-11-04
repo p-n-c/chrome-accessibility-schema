@@ -138,6 +138,6 @@ const runTreeBuilder = () => {
 
 const runValidator = () => {
   console.log('Instantiating the validator')
-  const validator = new HTMLValidator(rulesConfig, ruleHandlers)
+  const validator = new HTMLValidator(rulesConfig)
   return validator.validate()
 }
