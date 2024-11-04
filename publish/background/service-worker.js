@@ -120,8 +120,7 @@ chrome.runtime.onMessage.addListener((message) => {
         scanCurrentPage()
         break
       case 'highlight':
-        chrome.tabs.update(schemaTab.id, { active: true })
-        chrome.tabs.sendMessage(schemaTab.id, {
+        chrome.tabs.sendMessage(schemaTabId, {
           from: 'service-worker',
           message: 'highlight',
           elementId: message.elementId, // Match the case from side panel

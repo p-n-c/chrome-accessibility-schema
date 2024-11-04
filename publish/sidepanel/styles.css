@@ -160,6 +160,11 @@ input[type='checkbox']:checked {
   content: '⊂ ';
 }
 
+.highlighter {
+  color: white !important;
+  background-color: black !important;
+}
+
 button.highlight-button {
   color: black;
   background-color: white;

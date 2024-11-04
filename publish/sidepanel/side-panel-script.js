@@ -63,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           document.querySelectorAll('.highlight-button').forEach((el) => {
             el.addEventListener('click', (event) => {
+              if (event.target.classList.contains('highlighter')) {
+                event.target.classList.remove('highlighter')
+              } else {
+                document
+                  .querySelector('.highlighter')
+                  ?.classList.remove('highlighter')
+                event.target.classList.add('highlighter')
+              }
               askForHighlight(event.target.getAttribute('data-treeid'))
             })
           })
