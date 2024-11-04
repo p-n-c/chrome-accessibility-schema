@@ -28,3 +28,8 @@ const ruleHandlers = {
     validator: () => !!document.querySelector('meta[charset]'),
   },
 }
+
+// Export `ruleHandlers` for node.js environments
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { ruleHandlers }
+}

@@ -5,7 +5,6 @@ class HTMLValidator {
     this.results = []
     this.dataId = `data-${chrome.runtime.id}`
 
-    // All the validation functions in one object for easy iteration
     this.validationFunctions = {
       element: () => {
         this.rules.element.forEach((ruleGroup) => {
@@ -213,4 +212,9 @@ class HTMLValidator {
     })
     return this.results
   }
+}
+
+// Export `HTMLValidator` for node.js environments
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { HTMLValidator }
 }
