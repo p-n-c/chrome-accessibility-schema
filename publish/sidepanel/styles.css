@@ -160,10 +160,6 @@ input[type='checkbox']:checked {
   content: '⊂ ';
 }
 
-#generate-button {
-  padding: calc(var(--d) * 4) 0;
-}
-
 button.highlight-button {
   color: black;
   background-color: white;

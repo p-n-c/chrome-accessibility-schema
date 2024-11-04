@@ -27,7 +27,18 @@ function closeMe() {
   window.close()
 }
 
+function expandSchema() {
+  document
+    .querySelectorAll('details')
+    .forEach((details) => (details.open = true))
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Signal opening to service-worker to trigger analysis of current page
+  chrome.runtime.sendMessage({
+    from: 'side-panel',
+    message: 'loaded',
+  })
   // Listen for messages from the service worker
   chrome.runtime.onMessage.addListener((message) => {
     console.log(`Message received from ${message.from}: ${message.message}`)
@@ -41,8 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(message.content)
           displaySchema(schemaHtml.outerHTML)
+          expandSchema()
           const askForHighlight = (id) => {
-            port.postMessage({
+            chrome.runtime.sendMessage({
               from: 'side-panel',
               message: 'highlight',
               elementId: id,
@@ -97,21 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  // Buttons
-  document.getElementById('generate-schema').addEventListener('click', () => {
-    port.postMessage({
-      from: 'side-panel',
-      message: 'generate-schema',
-    })
-  })
-
   document
     .getElementById('expand-schema')
-    .addEventListener('click', function () {
-      document
-        .querySelectorAll('details')
-        .forEach((details) => (details.open = true))
-    })
+    .addEventListener('click', expandSchema)
 
   document
     .getElementById('collapse-schema')

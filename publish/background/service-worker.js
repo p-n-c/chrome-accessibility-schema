@@ -12,6 +12,44 @@ const closeSidePanel = async () => {
     .catch((error) => console.error(error))
 }
 
+const scanCurrentPage = async () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+    const tabId = tabs[0].id
+
+    // Execute the script
+    chrome.scripting
+      .executeScript({
+        target: { tabId },
+        func: runTreeBuilder,
+      })
+      .then((answers) => {
+        chrome.runtime
+          .sendMessage({
+            from: 'service-worker',
+            message: 'tree',
+            content: answers[0].result,
+          })
+          .catch((error) => console.log(error))
+      })
+      .catch((error) => console.log(error))
+    chrome.scripting
+      .executeScript({
+        target: { tabId },
+        func: runValidator,
+      })
+      .then((answers) => {
+        chrome.runtime
+          .sendMessage({
+            from: 'service-worker',
+            message: 'validation',
+            content: answers[0].result,
+          })
+          .catch((error) => console.log(error))
+      })
+      .catch((error) => console.log(error))
+  })
+}
+
 let isSidePanelOpen = false
 chrome.runtime.onInstalled.addListener(() => {
   console.log(`Extension version: ${chrome.runtime.getManifest().version}`)
@@ -45,53 +83,6 @@ chrome.runtime.onInstalled.addListener(() => {
   })
 })
 
-const scanCurrentPage = () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    schemaTab = sender.tabs[0]
-
-    // Create one-time listener for tab update
-    const onTabUpdate = (tabId, changeInfo, updatedTab) => {
-      // Only proceed if this is our tab and it's done loading
-      if (tabId === schemaTab.id && changeInfo.status === 'complete') {
-        // Remove the listener since we only need it once
-        chrome.tabs.onUpdated.removeListener(onTabUpdate)
-
-        // Execute the script
-        chrome.scripting
-          .executeScript({
-            target: { tabId },
-            func: runTreeBuilder,
-          })
-          .then((answers) => {
-            sidePanelPort.postMessage({
-              from: 'service-worker',
-              message: 'tree',
-              content: answers[0].result,
-            })
-          })
-          .catch((error) => console.log(error))
-        chrome.scripting
-          .executeScript({
-            target: { tabId },
-            func: runValidator,
-          })
-          .then((answers) => {
-            sidePanelPort.postMessage({
-              from: 'service-worker',
-              message: 'validation',
-              content: answers[0].result,
-            })
-          })
-      }
-    }
-
-    // Add the listener before reloading
-    chrome.tabs.onUpdated.addListener(onTabUpdate)
-    // Reload the tab
-    chrome.tabs.reload(schemaTab.id)
-  })
-}
-
 chrome.runtime.onMessage.addListener((message) => {
   if (message.from === 'side-panel') {
     console.log(`Message from ${message.from}: ${message.message}`)
@@ -99,7 +90,8 @@ chrome.runtime.onMessage.addListener((message) => {
       case 'closing':
         isSidePanelOpen = false
         break
-      case 'generate-schema':
+      case 'loaded':
+        scanCurrentPage()
         break
       case 'highlight':
         chrome.tabs.update(schemaTab.id, { active: true })
@@ -115,6 +107,7 @@ chrome.runtime.onMessage.addListener((message) => {
 
 // Content script injections
 const runTreeBuilder = () => {
+  console.log('Instantiating the tree builder')
   return treeBuilder.htmlDocumentToTree()
 }
 

@@ -19,8 +19,7 @@
         "content-scripts/validator-rules-config.js",
         "content-scripts/validator-core.js",
         "content-scripts/content-script.js"
-      ],
-      "run_at": "document_start"
+      ]
     }
   ],
   "action": {},
