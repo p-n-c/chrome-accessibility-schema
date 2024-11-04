@@ -2,6 +2,7 @@
 const { simpleUid } =
   typeof module !== 'undefined' && module.exports ? require('./utils') : utils
 
+// TODO Exclusion instead of inclusion for the tree elements
 const treeElements = [
   'a',
   'address',
@@ -103,13 +104,14 @@ const treeElementsWithText = [
 
 const landmarks = [
   'banner',
-  'navigation',
-  'main',
-  'contentinfo',
   'complementary',
+  'contentinfo',
   'form',
-  'search',
+  'main',
+  'navigation',
   'region',
+  'search',
+  'section',
 ]
 
 const landmarkRoles = ['contentinfo', 'complementary', 'region']
