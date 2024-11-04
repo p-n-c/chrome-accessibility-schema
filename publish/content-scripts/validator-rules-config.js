@@ -103,12 +103,12 @@ const rulesConfig = {
       elements: [
         {
           selector: 'input:not([type="hidden"])',
-          handlerId: 'input',
+          handlerId: 'labelable',
           message: 'Input elements must have associated labels',
         },
         {
           selector: 'select',
-          handlerId: 'select',
+          handlerId: 'labelable',
           message: 'Select elements must have associated labels',
         },
       ],

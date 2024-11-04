@@ -1,13 +1,10 @@
 const ruleHandlers = {
-  input: {
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#labelable
+  labelable: {
     validAssociation: (element) =>
       element.labels?.length > 0 ||
-      element.getAttribute('aria-label') ||
-      element.getAttribute('aria-labelledby'),
-  },
-  select: {
-    validAssociation: (element) =>
-      element.labels?.length > 0 || element.getAttribute('aria-label'),
+      element.getAttribute('aria-label') !== null ||
+      element.getAttribute('aria-labelledby') !== null,
   },
   title: {
     validator: (title) => !!title && title.trim().length > 0,

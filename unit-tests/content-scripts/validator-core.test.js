@@ -2,6 +2,79 @@ import { ruleHandlers } from '../../publish/content-scripts/validator-rule-handl
 import { rulesConfig } from '../../publish/content-scripts/validator-rules-config'
 import { HTMLValidator } from '../../publish/content-scripts/validator-core'
 
+// Rule Handlers Tests
+describe('Labelable Rule Handler Tests', () => {
+  test('should validate input with explicit label', () => {
+    document.body.innerHTML = `
+        <label for="test-input">Input Label</label>
+        <input id="test-input" type="text">
+      `
+    const element = document.querySelector('input')
+    expect(ruleHandlers.labelable.validAssociation(element)).toBe(true)
+  })
+
+  test('should validate input with aria-label', () => {
+    document.body.innerHTML = '<input type="text" aria-label="Test Label">'
+    const input = document.querySelector('input')
+    expect(ruleHandlers.labelable.validAssociation(input)).toBe(true)
+  })
+
+  test('should validate input with aria-labelledby', () => {
+    document.body.innerHTML = `
+        <div id="label">Test Label</div>
+        <input type="text" aria-labelledby="label">
+      `
+    const input = document.querySelector('input')
+    expect(ruleHandlers.labelable.validAssociation(input)).toBe(true)
+  })
+
+  test('should fail validation with no label association', () => {
+    document.body.innerHTML = '<input type="text">'
+    const input = document.querySelector('input')
+    expect(ruleHandlers.labelable.validAssociation(input)).toBe(false)
+  })
+})
+
+describe('Metadata Rule Handler Tests', () => {
+  test('title validator should pass with non-empty title', () => {
+    expect(ruleHandlers.title.validator('Test Title')).toBe(true)
+  })
+
+  test('title validator should fail with empty title', () => {
+    expect(ruleHandlers.title.validator('')).toBe(false)
+    expect(ruleHandlers.title.validator(' ')).toBe(false)
+  })
+
+  test('lang validator should pass with valid language codes', () => {
+    expect(ruleHandlers.lang.validator('en')).toBe(true)
+    expect(ruleHandlers.lang.validator('en-US')).toBe(true)
+    expect(ruleHandlers.lang.validator('fra')).toBe(true)
+  })
+
+  test('lang validator should fail with invalid language codes', () => {
+    expect(ruleHandlers.lang.validator('e')).toBe(false)
+    expect(ruleHandlers.lang.validator('english')).toBe(false)
+    expect(ruleHandlers.lang.validator('en-England')).toBe(false)
+  })
+
+  test('description validator should enforce length constraints', () => {
+    expect(ruleHandlers.description.validator('A'.repeat(30))).toBe(false) // Too short
+    expect(ruleHandlers.description.validator('A'.repeat(180))).toBe(false) // Too long
+    expect(ruleHandlers.description.validator('A'.repeat(100))).toBe(true) // Just right
+  })
+
+  test('description message formatter should provide appropriate messages', () => {
+    const shortDesc = 'Short'
+    let message = ruleHandlers.description.messageFormatter(shortDesc)
+    expect(message).toBe(
+      'Meta description must be between 50-160 characters (currently 5)'
+    )
+    // Empty Meta
+    message = ruleHandlers.description.messageFormatter('')
+    expect(message).toBe('Meta description is required')
+  })
+})
+
 // Validator Tests
 describe('HTMLValidator Element Tests', () => {
   let validator
@@ -178,99 +251,6 @@ describe('HTMLValidator Metadata Tests', () => {
         message: 'Meta description is required',
         type: 'error',
       })
-    )
-  })
-})
-
-// Rule Handlers Tests
-describe('Input Rule Handler Tests', () => {
-  test('should validate input with explicit label', () => {
-    document.body.innerHTML = `
-      <label for="test">Test Label</label>
-      <input id="test" type="text">
-    `
-    const input = document.querySelector('input')
-    expect(ruleHandlers.input.validAssociation(input)).toBe(true)
-  })
-
-  test('should validate input with aria-label', () => {
-    document.body.innerHTML = '<input type="text" aria-label="Test Label">'
-    const input = document.querySelector('input')
-    expect(ruleHandlers.input.validAssociation(input)).toBe(true)
-  })
-
-  test('should validate input with aria-labelledby', () => {
-    document.body.innerHTML = `
-      <div id="label">Test Label</div>
-      <input type="text" aria-labelledby="label">
-    `
-    const input = document.querySelector('input')
-    expect(ruleHandlers.input.validAssociation(input)).toBe(true)
-  })
-
-  test('should fail validation with no label association', () => {
-    document.body.innerHTML = '<input type="text">'
-    const input = document.querySelector('input')
-    expect(ruleHandlers.input.validAssociation(input)).toBe(false)
-  })
-})
-
-describe('Select Rule Handler Tests', () => {
-  test('should validate select with explicit label', () => {
-    document.body.innerHTML = `
-      <label for="test">Test Label</label>
-      <select id="test"></select>
-    `
-    const select = document.querySelector('select')
-    expect(ruleHandlers.select.validAssociation(select)).toBe(true)
-  })
-
-  test('should validate select with aria-label', () => {
-    document.body.innerHTML = '<select aria-label="Test Label"></select>'
-    const select = document.querySelector('select')
-    expect(ruleHandlers.select.validAssociation(select)).toBe(true)
-  })
-
-  test('should fail validation with no label association', () => {
-    document.body.innerHTML = '<select></select>'
-    const select = document.querySelector('select')
-    expect(ruleHandlers.select.validAssociation(select)).toBe(false)
-  })
-})
-
-describe('Metadata Rule Handler Tests', () => {
-  test('title validator should pass with non-empty title', () => {
-    expect(ruleHandlers.title.validator('Test Title')).toBe(true)
-  })
-
-  test('title validator should fail with empty title', () => {
-    expect(ruleHandlers.title.validator('')).toBe(false)
-    expect(ruleHandlers.title.validator(' ')).toBe(false)
-  })
-
-  test('lang validator should pass with valid language codes', () => {
-    expect(ruleHandlers.lang.validator('en')).toBe(true)
-    expect(ruleHandlers.lang.validator('en-US')).toBe(true)
-    expect(ruleHandlers.lang.validator('fra')).toBe(true)
-  })
-
-  test('lang validator should fail with invalid language codes', () => {
-    expect(ruleHandlers.lang.validator('e')).toBe(false)
-    expect(ruleHandlers.lang.validator('english')).toBe(false)
-    expect(ruleHandlers.lang.validator('en-USA')).toBe(false)
-  })
-
-  test('description validator should enforce length constraints', () => {
-    expect(ruleHandlers.description.validator('A'.repeat(30))).toBe(false) // Too short
-    expect(ruleHandlers.description.validator('A'.repeat(180))).toBe(false) // Too long
-    expect(ruleHandlers.description.validator('A'.repeat(100))).toBe(true) // Just right
-  })
-
-  test('description message formatter should provide appropriate messages', () => {
-    const shortDesc = 'Short'
-    const message = ruleHandlers.description.messageFormatter(shortDesc)
-    expect(message).toBe(
-      'Meta description must be between 50-160 characters (currently 5)'
     )
   })
 })
