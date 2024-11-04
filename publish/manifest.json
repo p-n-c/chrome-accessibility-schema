@@ -15,7 +15,6 @@
       "js": [
         "content-scripts/utils.js",
         "content-scripts/treeBuilder.js",
-        "content-scripts/validator-rule-handlers.js",
         "content-scripts/validator-rules-config.js",
         "content-scripts/validator-core.js",
         "content-scripts/content-script.js"

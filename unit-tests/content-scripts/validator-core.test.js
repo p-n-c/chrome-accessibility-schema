@@ -1,256 +1,220 @@
-import { ruleHandlers } from '../../publish/content-scripts/validator-rule-handlers'
 import { rulesConfig } from '../../publish/content-scripts/validator-rules-config'
 import { HTMLValidator } from '../../publish/content-scripts/validator-core'
 
-// Rule Handlers Tests
-describe('Labelable Rule Handler Tests', () => {
-  test('should validate input with explicit label', () => {
-    document.body.innerHTML = `
-        <label for="test-input">Input Label</label>
-        <input id="test-input" type="text">
-      `
-    const element = document.querySelector('input')
-    expect(ruleHandlers.labelable.validAssociation(element)).toBe(true)
-  })
-
-  test('should validate input with aria-label', () => {
-    document.body.innerHTML = '<input type="text" aria-label="Test Label">'
-    const input = document.querySelector('input')
-    expect(ruleHandlers.labelable.validAssociation(input)).toBe(true)
-  })
-
-  test('should validate input with aria-labelledby', () => {
-    document.body.innerHTML = `
-        <div id="label">Test Label</div>
-        <input type="text" aria-labelledby="label">
-      `
-    const input = document.querySelector('input')
-    expect(ruleHandlers.labelable.validAssociation(input)).toBe(true)
-  })
-
-  test('should fail validation with no label association', () => {
-    document.body.innerHTML = '<input type="text">'
-    const input = document.querySelector('input')
-    expect(ruleHandlers.labelable.validAssociation(input)).toBe(false)
-  })
-})
-
-describe('Metadata Rule Handler Tests', () => {
-  test('title validator should pass with non-empty title', () => {
-    expect(ruleHandlers.title.validator('Test Title')).toBe(true)
-  })
-
-  test('title validator should fail with empty title', () => {
-    expect(ruleHandlers.title.validator('')).toBe(false)
-    expect(ruleHandlers.title.validator(' ')).toBe(false)
-  })
-
-  test('lang validator should pass with valid language codes', () => {
-    expect(ruleHandlers.lang.validator('en')).toBe(true)
-    expect(ruleHandlers.lang.validator('en-US')).toBe(true)
-    expect(ruleHandlers.lang.validator('fra')).toBe(true)
-  })
-
-  test('lang validator should fail with invalid language codes', () => {
-    expect(ruleHandlers.lang.validator('e')).toBe(false)
-    expect(ruleHandlers.lang.validator('english')).toBe(false)
-    expect(ruleHandlers.lang.validator('en-England')).toBe(false)
-  })
-
-  test('description validator should enforce length constraints', () => {
-    expect(ruleHandlers.description.validator('A'.repeat(30))).toBe(false) // Too short
-    expect(ruleHandlers.description.validator('A'.repeat(180))).toBe(false) // Too long
-    expect(ruleHandlers.description.validator('A'.repeat(100))).toBe(true) // Just right
-  })
-
-  test('description message formatter should provide appropriate messages', () => {
-    const shortDesc = 'Short'
-    let message = ruleHandlers.description.messageFormatter(shortDesc)
-    expect(message).toBe(
-      'Meta description must be between 50-160 characters (currently 5)'
-    )
-    // Empty Meta
-    message = ruleHandlers.description.messageFormatter('')
-    expect(message).toBe('Meta description is required')
-  })
-})
-
-// Validator Tests
-describe('HTMLValidator Element Tests', () => {
+describe('HTMLValidator', () => {
   let validator
+  let container
 
   beforeEach(() => {
-    document.body.innerHTML = ''
+    validator = new HTMLValidator(rulesConfig)
+    container = document.createElement('div')
+    document.body.appendChild(container)
+    // Mock chrome.runtime.id for the data attribute
     global.chrome = { runtime: { id: 'test-id' } }
-    validator = new HTMLValidator(rulesConfig, ruleHandlers)
   })
 
-  test('should detect missing alt attribute on images', () => {
-    document.body.innerHTML = '<img src="test.jpg">'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Images must have alt text',
-        type: 'error',
-      })
+  afterEach(() => {
+    document.body.removeChild(container)
+    container = null
+  })
+
+  test('Images must have alt text for accessibility', () => {
+    // Invalid case
+    container.innerHTML = '<img src="test.jpg">'
+    let results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(1)
+    expect(results[0].message).toBe(
+      'Elements that represent content must have alt text'
     )
+
+    // Valid case
+    container.innerHTML = '<img src="test.jpg" alt="Test image">'
+    results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(0)
   })
 
-  test('should pass when image has alt attribute', () => {
-    document.body.innerHTML = '<img src="test.jpg" alt="test image">'
-    const results = validator.validate()
-    expect(results).not.toContainEqual(
-      expect.objectContaining({
-        message: 'Images must have alt text',
-      })
+  test('Links must have non-empty href attributes', () => {
+    // Invalid cases
+    container.innerHTML = `
+      <a>Empty link</a>
+      <a href="">Empty href</a>
+      <a href="  ">Whitespace href</a>
+    `
+    let results = validator.validate('element', 'attributePresence')
+    console.log(JSON.stringify(results, '', 2))
+    expect(results.length).toBe(3)
+    results.forEach((result) => {
+      expect(result.message).toBe('Links must have non-empty href attribute')
+    })
+
+    // Valid case
+    container.innerHTML = '<a href="https://example.com">Valid link</a>'
+    results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(0)
+  })
+
+  test('Interactive elements must have IDs for label association', () => {
+    container.innerHTML = `
+      <input type="text">
+      <button>Click me</button>
+      <select></select>
+    `
+    let results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(3)
+    results.forEach((result) => {
+      expect(result.message).toBe(
+        'Interactive elements need an ID for label association'
+      )
+    })
+
+    container.innerHTML = `
+      <input type="text" id="input1">
+      <button id="btn1">Click me</button>
+      <select id="select1"></select>
+    `
+    results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(0)
+  })
+
+  test('Buttons and interactive elements must have text content', () => {
+    container.innerHTML = `
+      <button></button>
+      <summary></summary>
+      <figcaption></figcaption>
+    `
+    let results = validator.validate('element', 'contentPresence')
+    expect(results.length).toBe(3)
+    results.forEach((result) => {
+      expect(result.message).toBe(
+        'Interactive and descriptive elements must have text content'
+      )
+    })
+
+    container.innerHTML = `
+      <button>Click me</button>
+      <summary>Details summary</summary>
+      <figcaption>Figure caption</figcaption>
+    `
+    results = validator.validate('element', 'contentPresence')
+    expect(results.length).toBe(0)
+  })
+
+  test('List items must be inside proper list containers', () => {
+    container.innerHTML = '<li>Orphaned list item</li>'
+    let results = validator.validate('structure', 'parentChild')
+    expect(results.length).toBe(1)
+    expect(results[0].message).toBe(
+      '<li> must be inside a <ul>, <ol>, or <menu> element'
     )
+
+    container.innerHTML = `
+      <ul><li>Valid list item</li></ul>
+      <ol><li>Numbered list item</li></ol>
+      <menu><li>Menu list item</li></menu>
+    `
+    results = validator.validate('structure', 'parentChild')
+    expect(results.length).toBe(0)
   })
 
-  test('should detect missing href on links', () => {
-    document.body.innerHTML = '<a>Click me</a>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Links must have href attribute',
-        type: 'error',
-      })
+  test('Table elements must maintain proper hierarchy', () => {
+    // Create orphaned cell
+    const orphanedCell = document.createElement('td')
+    orphanedCell.textContent = 'Orphaned cell'
+    container.appendChild(orphanedCell)
+
+    // Create row without table
+    const rowWithoutTable = document.createElement('tr')
+    const cellInRow = document.createElement('td')
+    cellInRow.textContent = 'Row without table'
+    rowWithoutTable.appendChild(cellInRow)
+    container.appendChild(rowWithoutTable)
+
+    let results = validator.validate('structure', 'parentChild')
+
+    // Check total number of errors
+    expect(results.length).toBe(2)
+
+    // Check if specific errors exist in results array, regardless of order
+    expect(results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: '<td> must be inside a <tr> element',
+        }),
+        expect.objectContaining({
+          message:
+            '<tr> must be inside a <table>, <thead>, <tbody>, or <tfoot> element',
+        }),
+      ])
     )
+
+    // Test valid structure
+    container.innerHTML = '' // Clear container
+    const table = document.createElement('table')
+    const row = document.createElement('tr')
+    const cell = document.createElement('td')
+    cell.textContent = 'Valid cell'
+    row.appendChild(cell)
+    table.appendChild(row)
+    container.appendChild(table)
+
+    results = validator.validate('structure', 'parentChild')
+    expect(results.length).toBe(0)
   })
 
-  test('should detect empty buttons', () => {
-    document.body.innerHTML = '<button></button>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Buttons must have text content',
-        type: 'error',
-      })
+  test('ARIA attributes must reference existing IDs', () => {
+    container.innerHTML = `
+      <button aria-labelledby="nonexistent">Invalid reference</button>
+      <div aria-describedby="missing">Invalid description</div>
+    `
+    let results = validator.validate('accessibility', 'ariaReference')
+    expect(results.length).toBe(2)
+    expect(results[0].message).toContain('must reference existing ID')
+
+    container.innerHTML = `
+      <span id="label">Label</span>
+      <button aria-labelledby="label">Valid reference</button>
+    `
+    results = validator.validate('accessibility', 'ariaReference')
+    expect(results.length).toBe(0)
+  })
+
+  test('Document must have proper metadata', () => {
+    document.title = ''
+    const html = document.documentElement
+    html.removeAttribute('lang')
+
+    let results = validator.validate('metadata', 'documentProperties')
+    expect(results.length).toBe(2)
+    expect(results).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: 'Document must have a non-empty title',
+        }),
+        expect.objectContaining({
+          message: 'Document must have a valid language code',
+        }),
+      ])
     )
-  })
-})
 
-describe('HTMLValidator Structure Tests', () => {
-  let validator
-
-  beforeEach(() => {
-    document.body.innerHTML = ''
-    global.chrome = { runtime: { id: 'test-id' } }
-    validator = new HTMLValidator(rulesConfig, ruleHandlers)
+    document.title = 'Valid Title'
+    html.setAttribute('lang', 'en-US')
+    results = validator.validate('metadata', 'documentProperties')
+    expect(results.length).toBe(0)
   })
 
-  test('should detect misplaced list items', () => {
-    document.body.innerHTML = '<div><li>Item</li></div>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: '<li> must be inside a <ul> or <ol> element',
-        type: 'error',
-      })
-    )
-  })
+  test('Viewport meta tag must be properly configured', () => {
+    const head = document.head
+    head.innerHTML = ''
 
-  test('should detect select elements without options', () => {
-    document.body.innerHTML = '<select></select>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Select elements must contain options',
-        type: 'error',
-      })
-    )
-  })
+    let results = validator.validate('metadata', 'metaTags')
+    expect(results.length).toBe(3) // viewport, description, charset missing
 
-  test('should detect misplaced table rows', () => {
-    document.body.innerHTML = '<div><tr><td>Data</td></tr></div>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Table rows must be inside appropriate table sections',
-        type: 'error',
-      })
-    )
-  })
-})
-
-describe('HTMLValidator Accessibility Tests', () => {
-  let validator
-
-  beforeEach(() => {
-    document.body.innerHTML = ''
-    global.chrome = { runtime: { id: 'test-id' } }
-    validator = new HTMLValidator(rulesConfig, ruleHandlers)
-  })
-
-  test('should detect invalid aria-labelledby reference', () => {
-    document.body.innerHTML = '<div aria-labelledby="nonexistent">Content</div>'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'aria-labelledby must reference existing ID',
-        type: 'error',
-      })
-    )
-  })
-
-  test('should detect inputs without labels', () => {
-    document.body.innerHTML = '<input type="text">'
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Input elements must have associated labels',
-        type: 'error',
-      })
-    )
-  })
-
-  test('should pass when input has aria-label', () => {
-    document.body.innerHTML = '<input type="text" aria-label="Test input">'
-    const results = validator.validate()
-    expect(results).not.toContainEqual(
-      expect.objectContaining({
-        message: 'Input elements must have associated labels',
-      })
-    )
-  })
-})
-
-describe('HTMLValidator Metadata Tests', () => {
-  let validator
-
-  beforeEach(() => {
-    document.body.innerHTML = ''
-    global.chrome = { runtime: { id: 'test-id' } }
-    validator = new HTMLValidator(rulesConfig, ruleHandlers)
-  })
-
-  test('should detect missing document title', () => {
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Document must have a non-empty title',
-        type: 'error',
-      })
-    )
-  })
-
-  test('should detect invalid language code', () => {
-    document.documentElement.setAttribute('lang', 'invalid')
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Document must have a valid language code',
-        type: 'error',
-      })
-    )
-  })
-
-  test('should detect missing meta description', () => {
-    const results = validator.validate()
-    expect(results).toContainEqual(
-      expect.objectContaining({
-        message: 'Meta description is required',
-        type: 'error',
-      })
-    )
+    head.innerHTML = `
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="This is a properly sized meta description that provides good context for search engines and users alike">
+      <meta charset="utf-8">
+    `
+    results = validator.validate('metadata', 'metaTags')
+    expect(results.length).toBe(0)
   })
 })
