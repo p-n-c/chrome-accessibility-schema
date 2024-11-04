@@ -1,7 +1,5 @@
 import './schemaGenerator.js'
 
-let timeoutID = undefined
-
 function displaySchema(schemaHtml) {
   const schemaContainer = document.getElementById('schema-content')
   schemaContainer.innerHTML = `${schemaHtml}`
