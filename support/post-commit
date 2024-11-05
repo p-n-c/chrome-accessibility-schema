@@ -6,7 +6,7 @@ EXTENSION_DIR="publish"
 ZIP_FILE="chrome-extension.zip"
 
 # Remove env entry from manifest
-sed '/^  "env": {/,/^  }/d' "$EXTENSION_DIR/manifest.json" > "$EXTENSION_DIR/manifest_no_env.json"
+sed '/^  "env": {/,/^  },/d' "$EXTENSION_DIR/manifest.json" > "$EXTENSION_DIR/manifest_no_env.json"
 
 # Replace the manifest before zipping the extension for publication
 mv "$EXTENSION_DIR/manifest.json" manifest_original.json
