@@ -13,7 +13,7 @@ mv "$EXTENSION_DIR/manifest.json" manifest_original.json
 mv "$EXTENSION_DIR/manifest_no_env.json" "$EXTENSION_DIR/manifest.json"
 
 # Create a zip file of the extension directory, including all subdirectories
-git archive -o "$ZIP_FILE" HEAD:"$EXTENSION_DIR"
+zip -r "$ZIP_FILE" "$EXTENSION_DIR"
 
 # Revert changes
 mv  manifest_original.json "$EXTENSION_DIR/manifest.json"
