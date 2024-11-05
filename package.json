@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint . && prettier --check . && stylelint '**/*.{css,scss}'",
-    "tests": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "tests:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+    "tests": "node node_modules/jest/bin/jest.js",
+    "tests:watch": "node node_modules/jest/bin/jest.js --watch"
   },
   "devDependencies": {
     "@babel/core": "^7.25.9",
