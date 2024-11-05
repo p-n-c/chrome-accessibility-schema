@@ -30,5 +30,9 @@
   },
   "side_panel": {
     "default_path": "sidepanel/side-panel.html"
+  },
+  "env": {
+    "DEBUG": "true",
+    "DEBUGURL": "https://p-n-c.github.io/website/accessibility/bad-test-card.html"
   }
 }
