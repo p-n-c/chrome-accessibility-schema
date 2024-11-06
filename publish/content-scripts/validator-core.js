@@ -14,7 +14,7 @@ class HTMLValidator {
     })
   }
 
-  validateBySelector(selector, validationFn, message, details = {}) {
+  validateBySelector({ selector, validationFn, message, details = {} }) {
     document.querySelectorAll(selector).forEach((element) => {
       if (!validationFn(element)) {
         this.addResult(element, message, 'error', details)
@@ -33,12 +33,12 @@ class HTMLValidator {
             (!theRuleType || theRuleType === ruleType.type)
           ) {
             ruleType.rules.forEach((rule) => {
-              this.validateBySelector(
-                rule.selector,
-                rule.validate,
-                rule.message,
-                rule.details
-              )
+              this.validateBySelector({
+                selector: rule.selector,
+                validationFn: rule.validate,
+                message: rule.message,
+                details: rule.details,
+              })
             })
           }
         })

@@ -4,19 +4,12 @@ import { HTMLValidator } from '../../publish/content-scripts/validator-core'
 describe('HTMLValidator', () => {
   let validator
   let container
+  // Mock chrome.runtime.id for the data attribute
+  global.chrome = { runtime: { id: 'test-id' } }
 
-  beforeEach(() => {
-    validator = new HTMLValidator(rulesConfig)
-    container = document.createElement('div')
-    document.body.appendChild(container)
-    // Mock chrome.runtime.id for the data attribute
-    global.chrome = { runtime: { id: 'test-id' } }
-  })
-
-  afterEach(() => {
-    document.body.removeChild(container)
-    container = null
-  })
+  validator = new HTMLValidator(rulesConfig)
+  container = document.createElement('div')
+  document.body.appendChild(container)
 
   test('Images must have alt text for accessibility', () => {
     // Invalid case

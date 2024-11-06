@@ -66,6 +66,7 @@ const scanCurrentPage = async () => {
 }
 
 let isSidePanelOpen = false
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log(`Extension version: ${chrome.runtime.getManifest().version}`)
   if (chrome.runtime.getManifest()?.env?.DEBUG || false) {
