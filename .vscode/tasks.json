@@ -16,7 +16,7 @@
       "script": "tests",
       "problemMatcher": [],
       "label": "npm: tests",
-      "detail": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+      "detail": "node node_modules/jest/bin/jest.js",
       "group": {
         "kind": "build",
         "isDefault": true

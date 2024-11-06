@@ -127,7 +127,7 @@ const matchFirstAttribute = (attributes, matches) => {
 }
 
 const treeBuilder = {
-  isValidNode: (node) => {
+  isValidElementNode: (node) => {
     return isValidElement(node)
       ? treeElements.includes(node.tagName.toLowerCase())
       : false
@@ -168,7 +168,7 @@ const treeBuilder = {
       // Recursively process each child element
       const children = element.children
       for (let child of children) {
-        if (treeBuilder.isValidNode(child)) {
+        if (treeBuilder.isValidElementNode(child)) {
           // Only process elements (ignore text, comments, scripts, etc.)
           const childTree = treeBuilder.buildHtmlTree(child)
           if (childTree) node.children.push(childTree)
@@ -195,6 +195,25 @@ const treeBuilder = {
     }
 
     return treeStructure
+  },
+
+  findAllNodesWithTag: (rootNode, tagName, depth = 0) => {
+    let matchingNodes = []
+    // Check the rootNode
+    if (rootNode?.tag === tagName) {
+      matchingNodes.push({ node: rootNode, depth: depth })
+    }
+    try {
+      for (let child of rootNode.children) {
+        depth++
+        matchingNodes.push(
+          ...treeBuilder.findAllNodesWithTag(child, tagName, depth)
+        )
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    return matchingNodes
   },
 }
 

@@ -1,13 +1,22 @@
 #!/bin/bash
-
 # Name of your extension directory
 EXTENSION_DIR="publish"
 
 # Name of the zip file (you can change this as needed)
 ZIP_FILE="chrome-extension.zip"
 
+# Remove env entry from manifest
+sed '/^  "env": {/,/^  },/d' "$EXTENSION_DIR/manifest.json" > "$EXTENSION_DIR/manifest_no_env.json"
+
+# Replace the manifest before zipping the extension for publication
+mv "$EXTENSION_DIR/manifest.json" manifest_original.json
+mv "$EXTENSION_DIR/manifest_no_env.json" "$EXTENSION_DIR/manifest.json"
+
 # Create a zip file of the extension directory, including all subdirectories
-git archive -o "$ZIP_FILE" HEAD:"$EXTENSION_DIR"
+zip -r "$ZIP_FILE" "$EXTENSION_DIR"
+
+# Revert changes
+mv  manifest_original.json "$EXTENSION_DIR/manifest.json"
 
 # If the zip was created successfully, allow the commit to proceed
 if [ $? -eq 0 ]; then

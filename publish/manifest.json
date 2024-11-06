@@ -15,7 +15,6 @@
       "js": [
         "content-scripts/utils.js",
         "content-scripts/treeBuilder.js",
-        "content-scripts/validator-rule-handlers.js",
         "content-scripts/validator-rules-config.js",
         "content-scripts/validator-core.js",
         "content-scripts/content-script.js"
@@ -28,6 +27,10 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "env": {
+    "DEBUG": true,
+    "DEBUGURL": "https://p-n-c.github.io/website/accessibility/bad-test-card.html"
   },
   "side_panel": {
     "default_path": "sidepanel/side-panel.html"
