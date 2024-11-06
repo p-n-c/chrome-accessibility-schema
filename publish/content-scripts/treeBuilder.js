@@ -132,7 +132,7 @@ const treeBuilder = {
       ? treeElements.includes(node.tagName.toLowerCase())
       : false
   },
-  createNode: (element) => {
+  createElementNode: (element) => {
     const id = simpleUid()
 
     element.setAttribute(`data-${chrome.runtime.id}`, id)
@@ -163,7 +163,7 @@ const treeBuilder = {
   },
   buildHtmlTree: (element) => {
     if (element.tagName.toLowerCase() !== 'script') {
-      const node = treeBuilder.createNode(element)
+      const node = treeBuilder.createElementNode(element)
 
       // Recursively process each child element
       const children = element.children

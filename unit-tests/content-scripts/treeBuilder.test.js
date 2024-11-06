@@ -32,10 +32,10 @@ describe('Tree builder - isValidElementNode', () => {
   })
 })
 
-describe('Tree builder - createNode', () => {
+describe('Tree builder - createElementNode', () => {
   it('should create a node with correct tag and id', () => {
     const element = document.createElement('div')
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.tag).toBe('div')
     expect(node.id).toBeDefined() // We only check if an ID exists.
@@ -45,7 +45,7 @@ describe('Tree builder - createNode', () => {
   it('should set the correct attribute if the element has one of the target attributes', () => {
     const element = document.createElement('div')
     element.id = 'test-id'
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.attribute).toBe('id: test-id')
   })
@@ -53,7 +53,7 @@ describe('Tree builder - createNode', () => {
   it('should not set the attribute field if no target attributes are present', () => {
     const element = document.createElement('div')
     element.setAttribute('data-custom', 'customValue')
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.attribute).toBe('')
   })
@@ -61,7 +61,7 @@ describe('Tree builder - createNode', () => {
   it('should add elementText for elements in treeElementsWithText', () => {
     const element = document.createElement('div')
     element.innerHTML = 'Sample Text'
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.elementText).toBe('Sample Text')
   })
@@ -69,14 +69,14 @@ describe('Tree builder - createNode', () => {
   it('should not add elementText for elements not in treeElementsWithText', () => {
     const element = document.createElement('img')
     element.innerText = 'Ignored Text'
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.elementText).toBe('')
   })
 
   it('should return a node with an empty children array', () => {
     const element = document.createElement('div')
-    const node = tb.createNode(element)
+    const node = tb.createElementNode(element)
 
     expect(node.children).toEqual([])
   })
