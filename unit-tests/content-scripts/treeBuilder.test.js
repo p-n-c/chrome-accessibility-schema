@@ -47,15 +47,16 @@ describe('Tree builder - createElementNode', () => {
     element.id = 'test-id'
     const node = tb.createElementNode(element)
 
-    expect(node.attribute).toBe('id: test-id')
+    expect(node.attributes[0][0]).toBe('id')
+    expect(node.attributes[0][1]).toBe('test-id')
   })
 
-  it('should not set the attribute field if no target attributes are present', () => {
+  it('should keep the attributes field as empty array if no target attributes are present', () => {
     const element = document.createElement('div')
     element.setAttribute('data-custom', 'customValue')
     const node = tb.createElementNode(element)
 
-    expect(node.attribute).toBe('')
+    expect(node.attributes.length).toBe(0)
   })
 
   it('should add elementText for elements in treeElementsWithText', () => {
@@ -225,7 +226,7 @@ describe('htmlDocumentToTree', () => {
 
     // Check the alt text of the images
     const firstImage = images[0].node
-    expect(firstImage.attribute).toContain('alt: Co-founder JP')
+    expect(firstImage.attributes[0]).toStrictEqual(['alt', 'Co-founder JP'])
   })
 
   it('should ignore script elements', () => {

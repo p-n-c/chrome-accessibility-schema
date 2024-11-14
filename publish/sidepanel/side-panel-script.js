@@ -74,8 +74,8 @@ function mergeValidationResults(tree, validationResults) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Eventually contains the processed tree with validation messages
-  let tree = undefined
+  // Contains the processed tree with validation messages - Global for easy query in console
+  window.tree = undefined
 
   // Signal opening to service-worker to trigger analysis of current page
   chrome.runtime.sendMessage({
@@ -95,15 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('page-title').innerHTML = message.content
           break
         case 'tree':
-          tree = message.content
+          window.tree = message.content
           // Wait for validation to display the schema
           break
         case 'validation':
           // Merge the validation elements into the tree data structure
           const validationResults = message.content
-          mergeValidationResults(tree, validationResults)
+          mergeValidationResults(window.tree, validationResults)
           // Inject the tree into the sidepanel
-          const schemaHtml = window.generateSchemaHtml(tree)
+          const schemaHtml = window.generateSchemaHtml(window.tree)
           displaySchema(schemaHtml.outerHTML)
           // Highlight buttons
           const askForHighlight = (id) => {

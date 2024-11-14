@@ -13,8 +13,10 @@ const schemaGenerator = {
 
     let nodeText = `<span class='tag'>${button} ${tree.tag}</span>`
 
-    if (tree.attribute.length != 0) {
-      nodeText += ` <span class='attribute'>${tree.attribute}</span>`
+    if (tree.attributes.length != 0) {
+      tree.attributes.forEach((attr) => {
+        nodeText += ` <span class='attribute'>${attr[0]}: ${attr[1]}</span>`
+      })
     }
 
     if (tree.elementText.length != 0) {
