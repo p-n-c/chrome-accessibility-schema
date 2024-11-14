@@ -1,16 +1,5 @@
 import './schemaGenerator.js'
-
-const landmarks = [
-  'banner',
-  'complementary',
-  'contentinfo',
-  'form',
-  'main',
-  'navigation',
-  'region',
-  'search',
-  'section',
-]
+import './schemaFilter.js'
 
 function displaySchema(schemaHtml) {
   const schemaContainer = document.getElementById('schema-content')
@@ -85,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listen for messages from the service worker
   chrome.runtime.onMessage.addListener((message) => {
     console.log(`Message received from ${message.from}: ${message.message}`)
+    // Message handling
     if (message.from === 'service-worker') {
       switch (message.message) {
         case 'close-side-panel':
@@ -150,6 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   )
+
+  const schemaFilter = new SchemaFilter()
+
   document.addEventListener('contextmenu', () => {
     let selection = document.getSelection()
     if (selection.anchorNode.parentElement.classList.contains('tag')) {

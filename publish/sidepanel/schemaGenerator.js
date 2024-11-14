@@ -9,7 +9,7 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>${tree.tag}</button>`
+    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' data-tag='${tree.tag}' class='highlight-button'>${tree.tag}</button>`
 
     let nodeText = `<span class='tag'>${button} </span>`
 

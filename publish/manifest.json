@@ -30,7 +30,7 @@
   },
   "env": {
     "DEBUG": true,
-    "DEBUGURL": "http://localhost:1234/workshops/materials/space-station-news.html"
+    "DEBUGURL": "https://p-n-c.github.io/website/"
   },
   "side_panel": {
     "default_path": "sidepanel/side-panel.html"

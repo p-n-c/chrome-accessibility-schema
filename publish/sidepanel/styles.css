@@ -8,6 +8,7 @@
   --d: 0.25rem;
 }
 
+/* Global Styles */
 body {
   padding: calc(var(--d) * 4);
   height: calc(100vh - var(--d) * 8);
@@ -16,6 +17,12 @@ body {
   overflow: hidden;
 }
 
+::selection {
+  background-color: black;
+  color: white;
+}
+
+/* Layout Components */
 main {
   flex: 1;
   overflow: auto;
@@ -41,6 +48,7 @@ footer {
   bottom: 0;
 }
 
+/* Button Styles */
 button {
   border: 1px solid darkgray;
   padding: 5px 10px;
@@ -50,6 +58,16 @@ button {
   font-size: 14px;
 }
 
+button.highlight-button {
+  color: black;
+  background-color: white;
+  padding: 0 3px 3px;
+  font-size: 14px;
+  border-radius: 3px;
+  border: 2px solid darkgray;
+}
+
+/* Schema Content Styles */
 #schema-content {
   position: relative;
   font-family: monospace;
@@ -65,11 +83,6 @@ button {
   margin: calc(var(--d)) 0;
 }
 
-::selection {
-  background-color: black;
-  color: white;
-}
-
 .attribute::before {
   content: '| ';
 }
@@ -79,7 +92,7 @@ button {
 }
 
 .validation::before {
-  content: '⊂ ';
+  content: 'âŠ‚ ';
 }
 
 .highlighter {
@@ -87,15 +100,31 @@ button {
   background-color: black !important;
 }
 
-button.highlight-button {
-  color: black;
-  background-color: white;
-  padding: 0 3px 3px;
-  font-size: 14px;
-  border-radius: 3px;
-  border: 2px solid darkgray;
-}
-
 #page-title {
   font-weight: normal;
+}
+
+.view-tabs {
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+}
+
+.view-tabs button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.view-tabs button:hover {
+  background: #f5f5f5;
+}
+
+.view-tabs button[aria-selected='true'] {
+  border: 1px solid #ccc;
+  border-bottom-color: white;
+  margin-bottom: -1px;
+  background: white;
 }
