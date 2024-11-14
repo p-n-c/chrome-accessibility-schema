@@ -21,7 +21,11 @@ const schemaGenerator = {
       nodeText += ` <span class='element-text'>${schemaGenerator.stringExtract(tree.elementText)}</span>`
     }
 
-    nodeText += ` <span class='validation'>✓</span>`
+    if (tree.validation.length != 0) {
+      tree.validation.forEach((item) => {
+        nodeText += ` <span class='validation'>${item.message}</span>`
+      })
+    }
 
     // Insert children
     if (children.length > 0) {

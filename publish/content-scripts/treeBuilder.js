@@ -102,20 +102,6 @@ const treeElementsWithText = [
   'textarea',
 ]
 
-const landmarks = [
-  'banner',
-  'complementary',
-  'contentinfo',
-  'form',
-  'main',
-  'navigation',
-  'region',
-  'search',
-  'section',
-]
-
-const landmarkRoles = ['contentinfo', 'complementary', 'region']
-
 const attributes = ['alt', 'id', 'class']
 
 const isValidElement = (node) => {
@@ -141,6 +127,7 @@ const treeBuilder = {
       id: id,
       attribute: '',
       elementText: '',
+      validation: [],
       children: [],
     }
 

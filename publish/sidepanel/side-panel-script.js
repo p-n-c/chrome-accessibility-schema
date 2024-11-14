@@ -1,5 +1,17 @@
 import './schemaGenerator.js'
 
+const landmarks = [
+  'banner',
+  'complementary',
+  'contentinfo',
+  'form',
+  'main',
+  'navigation',
+  'region',
+  'search',
+  'section',
+]
+
 function displaySchema(schemaHtml) {
   const schemaContainer = document.getElementById('schema-content')
   schemaContainer.innerHTML = `${schemaHtml}`
@@ -25,13 +37,45 @@ function closeMe() {
   window.close()
 }
 
-function expandSchema() {
-  document
-    .querySelectorAll('details')
-    .forEach((details) => (details.open = true))
+function mergeValidationResults(tree, validationResults) {
+  // Create a map for O(1) lookup of validation results
+  const validationMap = new Map()
+
+  validationResults.forEach((result) => {
+    const item = {
+      message: result.message,
+      type: result.type,
+      details: result.details,
+    }
+    if (validationMap.has(result.elementId)) {
+      validationMap.get(result.elementId).push(item)
+    } else {
+      validationMap.set(result.elementId, [item])
+    }
+  })
+
+  // Recursive function to traverse and update the tree in place
+  function updateNode(node) {
+    // Add validation if it exists
+    const validation = validationMap.get(node.id)
+    if (validation) {
+      node.validation = validation // Replace the empty array
+    }
+
+    // Recursively process children if they exist
+    if (node.children) {
+      node.children.forEach(updateNode)
+    }
+  }
+
+  // Recurse for each tree element
+  tree.forEach(updateNode)
+  return tree
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  let tree = undefined
+
   // Signal opening to service-worker to trigger analysis of current page
   chrome.runtime.sendMessage({
     from: 'side-panel',
@@ -50,10 +94,18 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('page-title').innerHTML = message.content
           break
         case 'tree':
+          tree = message.content
+          // Wait for validation to display the schema
+          break
+        case 'validation':
+          // Merge the validation elements into the tree data structure
+          const validationResults = message.content
+          console.log(JSON.stringify(validationResults, '', 2))
+          mergeValidationResults(tree, validationResults)
           // Inject the tree into the sidepanel
-          const schemaHtml = window.generateSchemaHtml(message.content)
+          const schemaHtml = window.generateSchemaHtml(tree)
           displaySchema(schemaHtml.outerHTML)
-          expandSchema()
+          // Highlight buttons
           const askForHighlight = (id) => {
             chrome.runtime.sendMessage({
               from: 'side-panel',
@@ -73,12 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
               }
               askForHighlight(event.target.getAttribute('data-treeid'))
             })
-          })
-          break
-        case 'validation':
-          message.content.forEach((item) => {
-            const selector = `#${item.element} span.validation`
-            document.querySelector(selector).innerHTML = item.message
           })
           break
         case 'reset-schema':
