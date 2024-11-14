@@ -21,13 +21,19 @@ const executeScriptAndSendMessage = async (tabId, func, messageType) => {
       func,
     })
 
-    await chrome.runtime.sendMessage({
-      from: 'service-worker',
-      message: messageType,
-      content: answers[0].result,
-    })
+    const result = answers[0].result
+    if (result && Object.keys(result).length !== 0) {
+      await chrome.runtime.sendMessage({
+        from: 'service-worker',
+        message: messageType,
+        content: result,
+      })
+      return true
+    }
+    return false
   } catch (error) {
     console.log(error)
+    return false
   }
 }
 
@@ -46,8 +52,20 @@ const scanCurrentPage = async () => {
     const tabProtocol = new URL(currentTab.url)?.protocol
     if (permittedProtocols.includes(tabProtocol)) {
       schemaTabId = currentTab.id
-      await executeScriptAndSendMessage(schemaTabId, runTreeBuilder, 'tree')
-      await executeScriptAndSendMessage(schemaTabId, runValidator, 'validation')
+      const treeResult = await executeScriptAndSendMessage(
+        schemaTabId,
+        runTreeBuilder,
+        'tree'
+      )
+      if (treeResult) {
+        await executeScriptAndSendMessage(
+          schemaTabId,
+          runValidator,
+          'validation'
+        )
+      } else {
+        return
+      }
     } else {
       await chrome.runtime.sendMessage({
         from: 'service-worker',

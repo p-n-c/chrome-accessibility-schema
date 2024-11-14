@@ -50,10 +50,6 @@ button {
   font-size: 14px;
 }
 
-#display-controls {
-  margin-top: 1rem;
-}
-
 #schema-content {
   position: relative;
   font-family: monospace;
@@ -70,22 +66,8 @@ button {
   color: white;
 }
 
-input[type='checkbox']:checked {
-  accent-color: black;
-}
-
 .attribute::before {
   content: '| ';
-}
-
-.checkbox-container {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 0.5rem;
-}
-
-.checkbox-container input[type='checkbox'] {
-  margin-right: 0.3rem;
 }
 
 .element-text::before {

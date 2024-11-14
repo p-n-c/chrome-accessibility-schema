@@ -166,27 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
       )
     }
   })
-
-  document
-    .getElementById('expand-schema')
-    .addEventListener('click', expandSchema)
-
-  document
-    .getElementById('collapse-schema')
-    .addEventListener('click', function () {
-      document
-        .querySelectorAll('details')
-        .forEach((details) => (details.open = false))
-    })
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      chrome.runtime.sendMessage({
-        from: 'side-panel',
-        message: 'closing',
-      })
-    }
-  })
 })
 
 // Classic mode, for Dan
