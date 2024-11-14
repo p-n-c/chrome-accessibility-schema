@@ -122,7 +122,7 @@ const getElementText = (element) => {
   let textContent = ''
   // Add text for selected elements
   if (treeElementsWithText.includes(element.nodeName.toLowerCase())) {
-    textContent = element.textContent
+    textContent = element.innerText || element.textContent
   }
   return textContent
 }
@@ -135,13 +135,14 @@ const treeBuilder = {
   },
   createElementNode: (element) => {
     const id = simpleUid()
-
+    const attributes = getElementAttributes(element)
+    const elementText = getElementText(element)
     element.setAttribute(`data-${chrome.runtime.id}`, id)
     const node = {
       tag: element.tagName.toLowerCase(),
       id: id,
-      attributes: getElementAttributes(element),
-      elementText: getElementText(element),
+      attributes,
+      elementText,
       validation: [],
       children: [],
     }

@@ -9,9 +9,9 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>←</button>`
+    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>${tree.tag}</button>`
 
-    let nodeText = `<span class='tag'>${button} ${tree.tag}</span>`
+    let nodeText = `<span class='tag'>${button} </span>`
 
     if (tree.attributes.length != 0) {
       tree.attributes.forEach((attr) => {
@@ -38,7 +38,7 @@ const schemaGenerator = {
       nodeText += `<div class="children">${childrenHtml}</div>`
     }
 
-    return `<div id='${tree.id}'>${nodeText}</div>`
+    return `<div id='${tree.id}' class='node'>${nodeText}</div>`
   },
 
   generateSchemaHtml: (treeStructure) => {
