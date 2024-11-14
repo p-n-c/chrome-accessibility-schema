@@ -145,12 +145,10 @@ chrome.runtime.onMessage.addListener((message) => {
 
 // Content script injections
 const runTreeBuilder = () => {
-  console.log('Instantiating the tree builder')
   return treeBuilder.htmlDocumentToTree()
 }
 
 const runValidator = () => {
-  console.log('Instantiating the validator')
   const validator = new HTMLValidator(rulesConfig)
   return validator.validate()
 }

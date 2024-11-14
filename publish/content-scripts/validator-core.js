@@ -26,7 +26,6 @@ class HTMLValidator {
     this.results = []
     Object.entries(this.rules).forEach(([category, ruleTypes]) => {
       if (!theCategory || theCategory === category) {
-        console.log(`Running validation for ${category}`)
         ruleTypes.forEach((ruleType) => {
           if (
             ruleType.rules &&

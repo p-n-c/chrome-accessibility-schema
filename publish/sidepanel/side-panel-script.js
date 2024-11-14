@@ -74,6 +74,7 @@ function mergeValidationResults(tree, validationResults) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Eventually contains the processed tree with validation messages
   let tree = undefined
 
   // Signal opening to service-worker to trigger analysis of current page
@@ -100,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'validation':
           // Merge the validation elements into the tree data structure
           const validationResults = message.content
-          console.log(JSON.stringify(validationResults, '', 2))
           mergeValidationResults(tree, validationResults)
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(tree)
