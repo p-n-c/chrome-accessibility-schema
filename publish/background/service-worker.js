@@ -112,11 +112,11 @@ chrome.runtime.onInstalled.addListener(async () => {
 })
 
 chrome.tabs.onUpdated.addListener(async () => {
-  await scanCurrentPage()
+  if (isSidePanelOpen) await scanCurrentPage()
 })
 
 chrome.tabs.onActivated.addListener(async () => {
-  await closeSidePanel()
+  if (isSidePanelOpen) await closeSidePanel()
 })
 
 chrome.runtime.onMessage.addListener((message) => {
