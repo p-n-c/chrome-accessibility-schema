@@ -2,12 +2,12 @@ let schemaTabId = undefined
 let isSidePanelOpen = false
 
 const closeSidePanel = async () => {
-  console.log('Sending close message to side panel')
   try {
     await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
     })
+    isSidePanelOpen = false
     schemaTabId = undefined
   } catch (error) {
     console.error(error)
@@ -99,8 +99,14 @@ chrome.runtime.onInstalled.addListener(async () => {
     if (isSidePanelOpen) {
       await closeSidePanel()
     } else {
-      await chrome.sidePanel.open({ windowId: tab.windowId })
-      isSidePanelOpen = true
+      try {
+        await chrome.sidePanel.open({ windowId: tab.windowId })
+        isSidePanelOpen = true
+        schemaTabId = tab.id
+      } catch (error) {
+        console.error('Error opening side panel:', error)
+        isSidePanelOpen = false
+      }
     }
   })
 })
@@ -120,8 +126,10 @@ chrome.runtime.onMessage.addListener((message) => {
     switch (message.message) {
       case 'closing':
         isSidePanelOpen = false
+        schemaTabId = undefined
         break
       case 'loaded':
+        isSidePanelOpen = true
         scanCurrentPage()
         break
       case 'highlight':
