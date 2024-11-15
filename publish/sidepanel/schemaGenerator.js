@@ -1,4 +1,7 @@
 const schemaGenerator = {
+  stringExtract: (str, len = 20) =>
+    str.length > len ? str.slice(0, 20) + '…' : str,
+
   htmlStringToDomElement: (htmlString) => {
     const container = document.createElement('div')
     container.innerHTML = htmlString.trim()
@@ -6,38 +9,36 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>←</button>`
-    // Base case: if there are no children, return a div with just the tag name
+    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' data-tag='${tree.tag}' class='highlight-button'>${tree.tag}</button>`
 
-    let nodeText = `<span class='tag'>${button} ${tree.tag}</span>`
+    let nodeText = `<span class='tag'>${button} </span>`
 
-    if (tree.attribute.length != 0) {
-      nodeText += ` <span class='attribute hidden'>${tree.attribute}</span>`
+    if (tree.attributes.length != 0) {
+      tree.attributes.forEach((attr) => {
+        nodeText += ` <span class='attribute'>${attr[0]}: ${attr[1]}</span>`
+      })
     }
 
     if (tree.elementText.length != 0) {
-      nodeText += ` <span class='element-text hidden'>${tree.elementText}</span>`
+      nodeText += ` <span class='element-text'>${schemaGenerator.stringExtract(tree.elementText)}</span>`
     }
 
-    nodeText += ` <span class='validation hidden'>✓</span>`
-
-    // Base case: if there are no children, return a span with just the tag name
-    if (children?.length === 0) {
-      return `<div id='${tree.id}'>${nodeText}</div>`
+    if (tree.validation.length != 0) {
+      tree.validation.forEach((item) => {
+        nodeText += ` <span class='validation'>${item.message}</span>`
+      })
     }
 
-    // Recursive case: create a details element with a summary and nested details
-    let childrenHtml = ''
-    for (const child of children) {
-      childrenHtml += schemaGenerator.generateTreeHtml(child)
+    // Insert children
+    if (children.length > 0) {
+      let childrenHtml = ''
+      for (const child of children) {
+        childrenHtml += schemaGenerator.generateTreeHtml(child)
+      }
+      nodeText += `<div class="children">${childrenHtml}</div>`
     }
 
-    return `
-      <details id='${tree.id}'>
-          <summary>${nodeText}</summary>
-          ${childrenHtml}
-      </details>
-    `
+    return `<div id='${tree.id}' class='node'>${nodeText}</div>`
   },
 
   generateSchemaHtml: (treeStructure) => {

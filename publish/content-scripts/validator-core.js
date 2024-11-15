@@ -7,7 +7,7 @@ class HTMLValidator {
 
   addResult(element, message, type = 'error', details = {}) {
     this.results.push({
-      element: element.getAttribute(this.dataId),
+      elementId: element.getAttribute(this.dataId),
       message: typeof message === 'function' ? message(element) : message,
       type,
       details,
@@ -26,7 +26,6 @@ class HTMLValidator {
     this.results = []
     Object.entries(this.rules).forEach(([category, ruleTypes]) => {
       if (!theCategory || theCategory === category) {
-        console.log(`Running validation for ${category}`)
         ruleTypes.forEach((ruleType) => {
           if (
             ruleType.rules &&

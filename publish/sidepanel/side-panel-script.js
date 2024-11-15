@@ -1,4 +1,5 @@
 import './schemaGenerator.js'
+import './schemaFilter.js'
 
 function displaySchema(schemaHtml) {
   const schemaContainer = document.getElementById('schema-content')
@@ -25,13 +26,46 @@ function closeMe() {
   window.close()
 }
 
-function expandSchema() {
-  document
-    .querySelectorAll('details')
-    .forEach((details) => (details.open = true))
+function mergeValidationResults(tree, validationResults) {
+  // Create a map for O(1) lookup of validation results
+  const validationMap = new Map()
+
+  validationResults.forEach((result) => {
+    const item = {
+      message: result.message,
+      type: result.type,
+      details: result.details,
+    }
+    if (validationMap.has(result.elementId)) {
+      validationMap.get(result.elementId).push(item)
+    } else {
+      validationMap.set(result.elementId, [item])
+    }
+  })
+
+  // Recursive function to traverse and update the tree in place
+  function updateNode(node) {
+    // Add validation if it exists
+    const validation = validationMap.get(node.id)
+    if (validation) {
+      node.validation = validation // Replace the empty array
+    }
+
+    // Recursively process children if they exist
+    if (node.children) {
+      node.children.forEach(updateNode)
+    }
+  }
+
+  // Recurse for each tree element
+  tree.forEach(updateNode)
+  return tree
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Contains the processed tree with validation messages - Global for easy query in console
+  window.tree = undefined
+
   // Signal opening to service-worker to trigger analysis of current page
   chrome.runtime.sendMessage({
     from: 'side-panel',
@@ -40,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listen for messages from the service worker
   chrome.runtime.onMessage.addListener((message) => {
     console.log(`Message received from ${message.from}: ${message.message}`)
+    // Message handling
     if (message.from === 'service-worker') {
       switch (message.message) {
         case 'close-side-panel':
@@ -50,10 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('page-title').innerHTML = message.content
           break
         case 'tree':
+          window.tree = message.content
+          // Wait for validation to display the schema
+          break
+        case 'validation':
+          // Merge the validation elements into the tree data structure
+          const validationResults = message.content
+          mergeValidationResults(window.tree, validationResults)
           // Inject the tree into the sidepanel
-          const schemaHtml = window.generateSchemaHtml(message.content)
+          const schemaHtml = window.generateSchemaHtml(window.tree)
           displaySchema(schemaHtml.outerHTML)
-          expandSchema()
+          // Highlight buttons
           const askForHighlight = (id) => {
             chrome.runtime.sendMessage({
               from: 'side-panel',
@@ -73,12 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
               }
               askForHighlight(event.target.getAttribute('data-treeid'))
             })
-          })
-          break
-        case 'validation':
-          message.content.forEach((item) => {
-            const selector = `#${item.element} span.validation`
-            document.querySelector(selector).innerHTML = item.message
           })
           break
         case 'reset-schema':
@@ -104,6 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   )
+
+  const schemaFilter = new SchemaFilter()
+
   document.addEventListener('contextmenu', () => {
     let selection = document.getSelection()
     if (selection.anchorNode.parentElement.classList.contains('tag')) {
@@ -118,27 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `https://developer.mozilla.org/en-US/docs/Web/HTML/Element/${selectedText}`,
         'mdn-from-sidepanel'
       )
-    }
-  })
-
-  document
-    .getElementById('expand-schema')
-    .addEventListener('click', expandSchema)
-
-  document
-    .getElementById('collapse-schema')
-    .addEventListener('click', function () {
-      document
-        .querySelectorAll('details')
-        .forEach((details) => (details.open = false))
-    })
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      chrome.runtime.sendMessage({
-        from: 'side-panel',
-        message: 'closing',
-      })
     }
   })
 })

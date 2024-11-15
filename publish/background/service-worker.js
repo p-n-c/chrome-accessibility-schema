@@ -1,127 +1,142 @@
-// Schema tab
 let schemaTabId = undefined
+let isSidePanelOpen = false
 
 const closeSidePanel = async () => {
-  console.log('Sending close message to side panel')
-  chrome.runtime
-    .sendMessage({
+  try {
+    await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
     })
-    .then(() => (schemaTabId = undefined))
-    .catch((error) => console.error(error))
+    isSidePanelOpen = false
+    schemaTabId = undefined
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const executeScriptAndSendMessage = async (tabId, func, messageType) => {
+  try {
+    const answers = await chrome.scripting.executeScript({
+      target: { tabId },
+      func,
+    })
+
+    const result = answers[0].result
+    if (result && Object.keys(result).length !== 0) {
+      await chrome.runtime.sendMessage({
+        from: 'service-worker',
+        message: messageType,
+        content: result,
+      })
+      return true
+    }
+    return false
+  } catch (error) {
+    console.log(error)
+    return false
+  }
 }
 
 const scanCurrentPage = async () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    chrome.runtime.sendMessage({
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    const currentTab = tabs[0]
+
+    await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'title',
-      content: tabs[0].title,
+      content: currentTab.title,
     })
 
-    // Only handle certain pages
     const permittedProtocols = ['http:', 'https:']
-    const tabProtocol = new URL(tabs[0].url)?.protocol
+    const tabProtocol = new URL(currentTab.url)?.protocol
     if (permittedProtocols.includes(tabProtocol)) {
-      schemaTabId = tabs[0].id
-      // Execute the script
-      chrome.scripting
-        .executeScript({
-          target: { tabId: schemaTabId },
-          func: runTreeBuilder,
-        })
-        .then((answers) => {
-          chrome.runtime
-            .sendMessage({
-              from: 'service-worker',
-              message: 'tree',
-              content: answers[0].result,
-            })
-            .catch((error) => console.log(error))
-        })
-        .catch((error) => console.log(error))
-      chrome.scripting
-        .executeScript({
-          target: { tabId: schemaTabId },
-          func: runValidator,
-        })
-        .then((answers) => {
-          chrome.runtime
-            .sendMessage({
-              from: 'service-worker',
-              message: 'validation',
-              content: answers[0].result,
-            })
-            .catch((error) => console.log(error))
-        })
-        .catch((error) => console.log(error))
+      schemaTabId = currentTab.id
+      const treeResult = await executeScriptAndSendMessage(
+        schemaTabId,
+        runTreeBuilder,
+        'tree'
+      )
+      if (treeResult) {
+        await executeScriptAndSendMessage(
+          schemaTabId,
+          runValidator,
+          'validation'
+        )
+      } else {
+        return
+      }
     } else {
-      chrome.runtime.sendMessage({
+      await chrome.runtime.sendMessage({
         from: 'service-worker',
         message: 'reset-schema',
       })
     }
-  })
+  } catch (error) {
+    console.error('Error in scanCurrentPage:', error)
+  }
 }
 
-let isSidePanelOpen = false
+const handleDebugMode = async () => {
+  const manifest = chrome.runtime.getManifest()
+  console.log(`Extension version: ${manifest.version}`)
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log(`Extension version: ${chrome.runtime.getManifest().version}`)
-  if (chrome.runtime.getManifest()?.env?.DEBUG || false) {
-    // Handle refresh issues when debugging
-    const debugUrl = chrome.runtime.getManifest().env.DEBUGURL
-    chrome.tabs
-      .query({
-        url: debugUrl,
-      })
-      .then((tabs) => {
-        if (tabs.length === 0) {
-          chrome.tabs
-            .update({
-              url: debugUrl,
-            })
-            .then(() => chrome.runtime.reload())
-        }
-      })
+  if (manifest?.env?.DEBUG) {
+    const debugUrl = manifest.env.DEBUGURL
+    const tabs = await chrome.tabs.query({ url: debugUrl })
+
+    if (tabs.length === 0) {
+      await chrome.tabs.update({ url: debugUrl })
+      chrome.runtime.reload()
+    }
   }
+}
+
+chrome.runtime.onInstalled.addListener(async () => {
+  await handleDebugMode()
 
   chrome.action.onClicked.addListener(async (tab) => {
     if (isSidePanelOpen) {
-      closeSidePanel()
-      // isSidePanelOpen managed when receiving the `closing` message
+      await closeSidePanel()
     } else {
-      await chrome.sidePanel.open({ windowId: tab.windowId }).then(() => {
+      try {
+        await chrome.sidePanel.open({ windowId: tab.windowId })
         isSidePanelOpen = true
-      })
+        schemaTabId = tab.id
+      } catch (error) {
+        console.error('Error opening side panel:', error)
+        isSidePanelOpen = false
+      }
     }
   })
 })
 
-chrome.tabs.onUpdated.addListener(() => {
-  scanCurrentPage()
+chrome.tabs.onUpdated.addListener(async () => {
+  if (isSidePanelOpen) await scanCurrentPage()
 })
 
-chrome.tabs.onActivated.addListener(() => {
-  closeSidePanel()
+chrome.tabs.onActivated.addListener(async () => {
+  if (isSidePanelOpen) await closeSidePanel()
 })
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.from === 'side-panel') {
     console.log(`Message from ${message.from}: ${message.message}`)
+
     switch (message.message) {
       case 'closing':
         isSidePanelOpen = false
+        schemaTabId = undefined
         break
       case 'loaded':
+        isSidePanelOpen = true
         scanCurrentPage()
         break
       case 'highlight':
         chrome.tabs.sendMessage(schemaTabId, {
           from: 'service-worker',
           message: 'highlight',
-          elementId: message.elementId, // Match the case from side panel
+          elementId: message.elementId,
         })
         break
     }
@@ -130,12 +145,10 @@ chrome.runtime.onMessage.addListener((message) => {
 
 // Content script injections
 const runTreeBuilder = () => {
-  console.log('Instantiating the tree builder')
   return treeBuilder.htmlDocumentToTree()
 }
 
 const runValidator = () => {
-  console.log('Instantiating the validator')
   const validator = new HTMLValidator(rulesConfig)
   return validator.validate()
 }

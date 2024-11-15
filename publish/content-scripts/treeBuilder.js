@@ -102,28 +102,29 @@ const treeElementsWithText = [
   'textarea',
 ]
 
-const landmarks = [
-  'banner',
-  'complementary',
-  'contentinfo',
-  'form',
-  'main',
-  'navigation',
-  'region',
-  'search',
-  'section',
-]
-
-const landmarkRoles = ['contentinfo', 'complementary', 'region']
-
-const attributes = ['alt', 'id', 'class']
+const attributesOfInterest = ['alt', 'id', 'class']
 
 const isValidElement = (node) => {
   return node.nodeType === 1
 }
 
-const matchFirstAttribute = (attributes, matches) => {
-  return attributes.find((attr) => matches.includes(attr))
+const getElementAttributes = (element) => {
+  let elementAttributes = []
+  Array.from(element.attributes).forEach((attr) => {
+    if (attributesOfInterest.includes(attr.name.toLowerCase())) {
+      elementAttributes.push([attr.name, attr.value])
+    }
+  })
+  return elementAttributes
+}
+
+const getElementText = (element) => {
+  let textContent = ''
+  // Add text for selected elements
+  if (treeElementsWithText.includes(element.nodeName.toLowerCase())) {
+    textContent = element.innerText || element.textContent
+  }
+  return textContent
 }
 
 const treeBuilder = {
@@ -134,28 +135,16 @@ const treeBuilder = {
   },
   createElementNode: (element) => {
     const id = simpleUid()
-
+    const attributes = getElementAttributes(element)
+    const elementText = getElementText(element)
     element.setAttribute(`data-${chrome.runtime.id}`, id)
     const node = {
       tag: element.tagName.toLowerCase(),
       id: id,
-      attribute: '',
-      elementText: '',
+      attributes,
+      elementText,
+      validation: [],
       children: [],
-    }
-
-    // Add text for selected attributes, and show attribute name
-    const match = matchFirstAttribute(attributes, element.getAttributeNames())
-    if (match) {
-      node.attribute = `${match}: ${element.getAttribute(match)}`
-    }
-
-    // Add text for selected elements
-    const includeText = treeElementsWithText.includes(
-      element.nodeName.toLowerCase()
-    )
-    if (includeText) {
-      node.elementText = `${element.textContent}`
     }
 
     // Return the node

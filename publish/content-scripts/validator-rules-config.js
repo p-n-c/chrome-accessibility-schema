@@ -453,7 +453,6 @@ const rulesConfig = {
           selector: 'html',
           validate: (element) => {
             const lang = element.getAttribute('lang')
-            console.log(lang)
             return !!lang && /^[a-zA-Z]{2,3}(-[a-zA-Z]{2,3})?$/.test(lang)
           },
           message: 'Document must have a valid language code',
