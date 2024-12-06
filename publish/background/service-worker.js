@@ -42,6 +42,8 @@ const scanCurrentPage = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
 
+    console.log('tabs: ', tabs)
+
     await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'title',
@@ -50,8 +52,10 @@ const scanCurrentPage = async () => {
 
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
+    console.log('tabProtocol: ', tabProtocol)
     if (permittedProtocols.includes(tabProtocol)) {
       schemaTabId = currentTab.id
+      console.log('schemaTabId: ', schemaTabId)
       const treeResult = await executeScriptAndSendMessage(
         schemaTabId,
         runTreeBuilder,
@@ -77,24 +81,7 @@ const scanCurrentPage = async () => {
   }
 }
 
-const handleDebugMode = async () => {
-  const manifest = chrome.runtime.getManifest()
-  console.log(`Extension version: ${manifest.version}`)
-
-  if (manifest?.env?.DEBUG) {
-    const debugUrl = manifest.env.DEBUGURL
-    const tabs = await chrome.tabs.query({ url: debugUrl })
-
-    if (tabs.length === 0) {
-      await chrome.tabs.update({ url: debugUrl })
-      chrome.runtime.reload()
-    }
-  }
-}
-
 chrome.runtime.onInstalled.addListener(async () => {
-  await handleDebugMode()
-
   chrome.action.onClicked.addListener(async (tab) => {
     if (isSidePanelOpen) {
       await closeSidePanel()
