@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'reset-schema':
           document.getElementById('schema-content').innerHTML =
             'No schema to display, please load a valid page.'
+          break
       }
     }
   })

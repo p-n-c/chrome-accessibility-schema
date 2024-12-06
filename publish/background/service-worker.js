@@ -3,7 +3,7 @@ let isSidePanelOpen = false
 
 const closeSidePanel = async () => {
   try {
-    await chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
     })
@@ -83,8 +83,12 @@ const scanCurrentPage = async () => {
 
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.action.onClicked.addListener(async (tab) => {
+    console.log('Visitor clicked on icon')
     if (isSidePanelOpen) {
-      await closeSidePanel()
+      closeSidePanel()
+
+      // Toggle side panel visibility
+      isSidePanelOpen = !isSidePanelOpen
     } else {
       try {
         await chrome.sidePanel.open({ windowId: tab.windowId })
@@ -103,7 +107,10 @@ chrome.tabs.onUpdated.addListener(async () => {
 })
 
 chrome.tabs.onActivated.addListener(async () => {
-  if (isSidePanelOpen) await closeSidePanel()
+  if (isSidePanelOpen) closeSidePanel()
+
+  // While the side panel is closed, this statement is always true
+  isSidePanelOpen = false
 })
 
 chrome.runtime.onMessage.addListener((message) => {
