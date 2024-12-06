@@ -28,10 +28,6 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "env": {
-    "DEBUG": true,
-    "DEBUGURL": "https://p-n-c.github.io/website/"
-  },
   "side_panel": {
     "default_path": "sidepanel/side-panel.html"
   }

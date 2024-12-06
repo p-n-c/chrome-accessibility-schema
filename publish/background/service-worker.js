@@ -3,7 +3,7 @@ let isSidePanelOpen = false
 
 const closeSidePanel = async () => {
   try {
-    await chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
     })
@@ -42,6 +42,8 @@ const scanCurrentPage = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
 
+    console.log('tabs: ', tabs)
+
     await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'title',
@@ -50,8 +52,10 @@ const scanCurrentPage = async () => {
 
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
+    console.log('tabProtocol: ', tabProtocol)
     if (permittedProtocols.includes(tabProtocol)) {
       schemaTabId = currentTab.id
+      console.log('schemaTabId: ', schemaTabId)
       const treeResult = await executeScriptAndSendMessage(
         schemaTabId,
         runTreeBuilder,
@@ -77,27 +81,14 @@ const scanCurrentPage = async () => {
   }
 }
 
-const handleDebugMode = async () => {
-  const manifest = chrome.runtime.getManifest()
-  console.log(`Extension version: ${manifest.version}`)
-
-  if (manifest?.env?.DEBUG) {
-    const debugUrl = manifest.env.DEBUGURL
-    const tabs = await chrome.tabs.query({ url: debugUrl })
-
-    if (tabs.length === 0) {
-      await chrome.tabs.update({ url: debugUrl })
-      chrome.runtime.reload()
-    }
-  }
-}
-
 chrome.runtime.onInstalled.addListener(async () => {
-  await handleDebugMode()
-
   chrome.action.onClicked.addListener(async (tab) => {
+    console.log('Visitor clicked on icon')
     if (isSidePanelOpen) {
-      await closeSidePanel()
+      closeSidePanel()
+
+      // Toggle side panel visibility
+      isSidePanelOpen = !isSidePanelOpen
     } else {
       try {
         await chrome.sidePanel.open({ windowId: tab.windowId })
@@ -116,7 +107,10 @@ chrome.tabs.onUpdated.addListener(async () => {
 })
 
 chrome.tabs.onActivated.addListener(async () => {
-  if (isSidePanelOpen) await closeSidePanel()
+  if (isSidePanelOpen) closeSidePanel()
+
+  // While the side panel is closed, this statement is always true
+  isSidePanelOpen = false
 })
 
 chrome.runtime.onMessage.addListener((message) => {
