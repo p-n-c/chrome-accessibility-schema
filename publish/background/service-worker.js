@@ -14,15 +14,23 @@ const closeSidePanel = async () => {
   }
 }
 
-const executeScriptAndSendMessage = async (tabId, func, messageType) => {
+const executeScriptAndSendMessage = async ({
+  tabId,
+  func,
+  messageType,
+  forceSendMessage = false,
+}) => {
   try {
     const answers = await chrome.scripting.executeScript({
       target: { tabId },
       func,
     })
-
     const result = answers[0].result
-    if (result && Object.keys(result).length !== 0) {
+
+    const sendMessage =
+      (result && Object.keys(result).length !== 0) || forceSendMessage
+
+    if (sendMessage) {
       await chrome.runtime.sendMessage({
         from: 'service-worker',
         message: messageType,
@@ -42,8 +50,6 @@ const scanCurrentPage = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
 
-    console.log('tabs: ', tabs)
-
     await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'title',
@@ -52,21 +58,21 @@ const scanCurrentPage = async () => {
 
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
-    console.log('tabProtocol: ', tabProtocol)
+
     if (permittedProtocols.includes(tabProtocol)) {
       schemaTabId = currentTab.id
-      console.log('schemaTabId: ', schemaTabId)
-      const treeResult = await executeScriptAndSendMessage(
-        schemaTabId,
-        runTreeBuilder,
-        'tree'
-      )
+      const treeResult = await executeScriptAndSendMessage({
+        tabId: schemaTabId,
+        func: runTreeBuilder,
+        messageType: 'tree',
+      })
       if (treeResult) {
-        await executeScriptAndSendMessage(
-          schemaTabId,
-          runValidator,
-          'validation'
-        )
+        await executeScriptAndSendMessage({
+          tabId: schemaTabId,
+          func: runValidator,
+          messageType: 'validation',
+          forceSendMessage: true,
+        })
       } else {
         return
       }
@@ -77,7 +83,7 @@ const scanCurrentPage = async () => {
       })
     }
   } catch (error) {
-    console.error('Error in scanCurrentPage:', error)
+    console.error('Error in scan current page:', error)
   }
 }
 
@@ -102,8 +108,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   })
 })
 
-chrome.tabs.onUpdated.addListener(async () => {
-  if (isSidePanelOpen) await scanCurrentPage()
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
+  if (isSidePanelOpen) scanCurrentPage()
 })
 
 chrome.tabs.onActivated.addListener(async () => {

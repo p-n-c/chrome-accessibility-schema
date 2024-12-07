@@ -185,7 +185,6 @@ const treeBuilder = {
 
     return treeStructure
   },
-
   findAllNodesWithTag: (rootNode, tagName, depth = 0) => {
     let matchingNodes = []
     // Check the rootNode
