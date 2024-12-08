@@ -139,6 +139,9 @@ chrome.runtime.onMessage.addListener((message) => {
           elementId: message.elementId,
         })
         break
+      default:
+        // do nothing
+        break
     }
   }
 })

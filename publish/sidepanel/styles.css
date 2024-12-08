@@ -9,43 +9,56 @@
 }
 
 /* Global Styles */
-body {
-  padding: calc(var(--d) * 4);
-  height: calc(100vh - var(--d) * 8);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 ::selection {
   background-color: black;
   color: white;
 }
 
 /* Layout Components */
-main {
-  flex: 1;
-  overflow: auto;
-  min-height: 0;
+body {
+  padding: calc(var(--d) * 4) calc(var(--d) * 4) 0;
   position: relative;
+}
+
+main {
+  padding-top: calc(var(--d) * 32);
+  padding-bottom: calc(var(--d) * 16);
 }
 
 header,
 footer {
-  display: block;
+  position: fixed;
   width: 100%;
+  height: calc(var(--d) * 16);
   background-color: var(--bg-colour);
-  z-index: 10;
-  padding: calc(var(--d) * 4) 0;
-  position: sticky;
+  display: flex;
 }
 
 header {
   top: 0;
+  flex-direction: column;
+  justify-content: center;
 }
 
 footer {
   bottom: 0;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.8;
+}
+
+nav {
+  background-color: var(--bg-colour);
+}
+
+h1 {
+  font-size: 1.1rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: calc(var(--d) * 8) 0 calc(var(--d) * 4);
 }
 
 /* Button Styles */
@@ -68,12 +81,6 @@ button.highlight-button {
 }
 
 /* Schema Content Styles */
-#schema-content {
-  position: relative;
-  font-family: monospace;
-  font-size: 14px;
-  color: #333;
-}
 
 .children {
   margin-left: 1rem;
