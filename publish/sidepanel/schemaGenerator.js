@@ -1,6 +1,19 @@
 const schemaGenerator = {
-  stringExtract: (str, len = 20) =>
-    str.length > len ? str.slice(0, 20) + '…' : str,
+  stringExtract: ({ str, len = 20, tag }) => {
+    switch (tag) {
+      case 'p':
+        const sentenceEndings = /[.!?]/
+        const paragraph = str.trim()
+
+        const match = paragraph.match(sentenceEndings)
+
+        return match ? paragraph.slice(0, match.index + 1).trim() : paragraph
+        // str.length > len ? str.slice(0, 20) + '…' : str
+        break
+      default:
+        return str
+    }
+  },
 
   htmlStringToDomElement: (htmlString) => {
     const container = document.createElement('div')
@@ -9,9 +22,11 @@ const schemaGenerator = {
   },
   generateTreeHtml: (tree) => {
     const children = tree?.children || []
-    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' data-tag='${tree.tag}' class='highlight-button'>${tree.tag}</button>`
+    const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>${tree.tag}</button>`
 
-    let nodeText = `<span class='tag'>${button} </span>`
+    let nodeText = `<div class='tag inline' data-tag='${tree.tag}'>${button} </div>`
+
+    nodeText += '<div class="inline hidden">'
 
     if (tree.attributes.length != 0) {
       tree.attributes.forEach((attr) => {
@@ -20,7 +35,7 @@ const schemaGenerator = {
     }
 
     if (tree.elementText.length != 0) {
-      nodeText += ` <span class='element-text'>${schemaGenerator.stringExtract(tree.elementText)}</span>`
+      nodeText += ` <span class='element-text'>${schemaGenerator.stringExtract({ str: tree.elementText, tag: tree.tag })}</span>`
     }
 
     if (tree.validation.length != 0) {
@@ -28,6 +43,8 @@ const schemaGenerator = {
         nodeText += ` <span class='validation'>${item.message}</span>`
       })
     }
+
+    nodeText += '</div>'
 
     // Insert children
     if (children.length > 0) {

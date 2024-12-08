@@ -1,6 +1,8 @@
 :root {
   --bg-colour: white;
   --fg-colour: black;
+  --border-colour: darkgrey;
+  --child-colour: #eee;
   --line-colour: lightgrey;
   --accent-colour: orange;
   --up: red;
@@ -9,48 +11,64 @@
 }
 
 /* Global Styles */
-body {
-  padding: calc(var(--d) * 4);
-  height: calc(100vh - var(--d) * 8);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 ::selection {
-  background-color: black;
-  color: white;
+  background-color: var(--fg-colour);
+  color: var(--bg-colour);
 }
 
 /* Layout Components */
-main {
-  flex: 1;
-  overflow: auto;
-  min-height: 0;
+body {
+  padding: calc(var(--d) * 4) calc(var(--d) * 4) 0;
   position: relative;
+}
+
+main {
+  padding-top: calc(var(--d) * 28);
+  padding-bottom: calc(var(--d) * 16);
 }
 
 header,
 footer {
-  display: block;
-  width: 100%;
+  position: fixed;
+  width: 100% - calc(var(--d) * 4);
+  height: calc(var(--d) * 16);
   background-color: var(--bg-colour);
-  z-index: 10;
-  padding: calc(var(--d) * 4) 0;
-  position: sticky;
+  display: flex;
 }
 
 header {
   top: 0;
+  flex-direction: column;
 }
 
 footer {
   bottom: 0;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.8;
+}
+
+nav {
+  background-color: var(--bg-colour);
+}
+
+h1 {
+  font-size: 1.1rem;
+}
+
+h2 {
+  font-size: 1rem;
+  margin: calc(var(--d) * 6) 0 calc(var(--d) * 2);
+}
+
+.controls {
+  background-color: var(--bg-colour);
 }
 
 /* Button Styles */
 button {
-  border: 1px solid darkgray;
+  border: 1px solid var(--border-colour);
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 4px;
@@ -59,20 +77,19 @@ button {
 }
 
 button.highlight-button {
-  color: black;
-  background-color: white;
-  padding: 0 3px 3px;
+  margin: calc(var(--d) * 0.5) 0;
+  padding: var(--d) calc(var(--d) * 2);
+  color: var(--fg-colour);
+  background-color: var(--bg-colour);
   font-size: 14px;
   border-radius: 3px;
-  border: 2px solid darkgray;
+  border: 1px solid var(--border-colour);
 }
 
 /* Schema Content Styles */
-#schema-content {
-  position: relative;
-  font-family: monospace;
-  font-size: 14px;
-  color: #333;
+
+#schema-placeholder {
+  margin-top: 4rem;
 }
 
 .children {
@@ -83,21 +100,15 @@ button.highlight-button {
   margin: calc(var(--d)) 0;
 }
 
-.attribute::before {
-  content: '| ';
-}
-
-.element-text::before {
-  content: '> ';
-}
-
-.validation::before {
-  content: 'âŠ‚ ';
-}
-
 .highlighter {
-  color: white !important;
-  background-color: black !important;
+  button {
+    color: var(--bg-colour) !important;
+    background-color: var(--fg-colour) !important;
+  }
+
+  & ~ .children button {
+    background-color: var(--child-colour);
+  }
 }
 
 #page-title {
@@ -124,7 +135,38 @@ button.highlight-button {
 
 .view-tabs button[aria-selected='true'] {
   border: 1px solid #ccc;
-  border-bottom-color: white;
+  border-bottom-color: var(--bg-colour);
   margin-bottom: -1px;
-  background: white;
+  background: var(--bg-colour);
+}
+
+/* Schema rules */
+
+.inline {
+  display: inline;
+}
+
+.hidden {
+  display: none;
+}
+
+.schema {
+}
+
+[data-tag='html'],
+[data-tag='meta'],
+[data-tag='title'],
+[data-tag='head'],
+[data-tag='link'],
+[data-tag='style'] {
+  display: none;
+}
+
+div[data-tag^='h'] + div,
+div[data-tag='p'] + div {
+  display: inline-block;
+
+  .attribute {
+    display: none;
+  }
 }
