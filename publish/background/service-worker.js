@@ -119,9 +119,13 @@ chrome.tabs.onActivated.addListener(async () => {
   isSidePanelOpen = false
 })
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener(async (message) => {
   if (message.from === 'side-panel') {
     console.log(`Message from ${message.from}: ${message.message}`)
+
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    const currentTab = tabs[0]
+    schemaTabId = currentTab.id
 
     switch (message.message) {
       case 'closing':
