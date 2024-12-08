@@ -7,7 +7,6 @@ const closeSidePanel = async () => {
       from: 'service-worker',
       message: 'close-side-panel',
     })
-    isSidePanelOpen = false
     schemaTabId = undefined
   } catch (error) {
     console.error(error)
@@ -129,11 +128,9 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
     switch (message.message) {
       case 'closing':
-        isSidePanelOpen = false
         schemaTabId = undefined
         break
       case 'loaded':
-        isSidePanelOpen = true
         scanCurrentPage()
         break
       case 'highlight':

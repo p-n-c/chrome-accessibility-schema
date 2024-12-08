@@ -2,8 +2,16 @@ import './schemaGenerator.js'
 import './schemaFilter.js'
 
 function displaySchema(schemaHtml) {
+  const schemaPlaceholder = document.getElementById('schema-placeholder')
   const schemaContainer = document.getElementById('schema-content')
+
+  schemaPlaceholder.classList.toggle('hidden')
+  schemaContainer.classList.toggle('hidden')
   schemaContainer.innerHTML = `${schemaHtml}`
+
+  document
+    .querySelector('[data-view="schema"]')
+    .setAttribute('aria-selected', true)
 }
 
 function extendSelectionToWord(selection) {
@@ -105,21 +113,22 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           document.querySelectorAll('.highlight-button').forEach((el) => {
             el.addEventListener('click', (event) => {
-              if (event.target.classList.contains('highlighter')) {
-                event.target.classList.remove('highlighter')
+              const tag = event.target.parentElement
+              if (tag.classList.contains('highlighter')) {
+                tag.classList.remove('highlighter')
               } else {
                 document
                   .querySelector('.highlighter')
                   ?.classList.remove('highlighter')
-                event.target.classList.add('highlighter')
+                tag.classList.add('highlighter')
               }
               askForHighlight(event.target.getAttribute('data-treeid'))
             })
           })
           break
         case 'reset-schema':
-          document.getElementById('schema-content').innerHTML =
-            'No schema to display, please load a valid page.'
+          schemaPlaceholder.classList.toggle('hidden')
+          schemaContainer.classList.toggle('hidden')
           break
       }
     }
