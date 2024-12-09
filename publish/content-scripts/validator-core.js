@@ -2,7 +2,7 @@ class HTMLValidator {
   constructor(rules) {
     this.rules = rules
     this.results = []
-    this.dataId = `data-${chrome.runtime.id}`
+    this.dataId = 'data-pac'
   }
 
   addResult(element, message, type = 'error', details = {}) {

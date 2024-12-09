@@ -39,7 +39,7 @@ describe('Tree builder - createElementNode', () => {
 
     expect(node.tag).toBe('div')
     expect(node.id).toBeDefined() // We only check if an ID exists.
-    expect(element.getAttribute(`data-${chrome.runtime.id}`)).toBeDefined() // Checks if a data attribute is set.
+    expect(element.getAttribute('data-pac')).toBeDefined() // Checks if a data attribute is set.
   })
 
   it('should set the correct attribute if the element has one of the target attributes', () => {

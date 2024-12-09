@@ -30,10 +30,6 @@ function openOrReloadWindow(url, windowName) {
   }
 }
 
-function closeMe() {
-  window.close()
-}
-
 function mergeValidationResults(tree, validationResults) {
   // Create a map for O(1) lookup of validation results
   const validationMap = new Map()
@@ -87,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       switch (message.message) {
         case 'close-side-panel':
           // Closing the side panel
-          closeMe()
+          window.close()
           break
         case 'title':
           document.getElementById('page-title').innerHTML = message.content
@@ -170,7 +166,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 })
-
-// Classic mode, for Dan
-// prettier-ignore
-window.activateClassicMode=(function(){const styles=`.cm-overlay{display:none;position:absolute;background:rgb(255 255 255 / 90%);z-index:1000;justify-content:center;text-align:center;padding:20px;}.cm-disabled{overflow:hidden;cursor:not-allowed;}.cm-disabled .cm-overlay{display:inline-block;inset:0;}`;const overlay=`<div class="cm-overlay">Connection with page lost.<br><br>Side panel closing soon</div>`;return function(){const styleSheet=document.createElement('style');styleSheet.id='classic-mode-styles';styleSheet.textContent=styles;document.head.appendChild(styleSheet);document.body.insertAdjacentHTML('afterbegin',overlay);console.log('%c⚠️ Classic Mode Activated ⚠️',`color:white;font-size:20px;padding:10px;font-weight:bold;background:#9932CC;animation:backgroundPulse 1s infinite;@keyframes backgroundPulse{50%{background:#7FFF00;}}`);setTimeout(()=>{document.querySelector('body').classList.add('cm-disabled');setTimeout(()=>window.close(),10000)},Math.random(5000)+5000)}})();

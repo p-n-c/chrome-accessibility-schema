@@ -137,7 +137,7 @@ const treeBuilder = {
     const id = simpleUid()
     const attributes = getElementAttributes(element)
     const elementText = getElementText(element)
-    element.setAttribute(`data-${chrome.runtime.id}`, id)
+    element.setAttribute('data-pac', id)
     const node = {
       tag: element.tagName.toLowerCase(),
       id: id,

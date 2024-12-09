@@ -127,6 +127,10 @@ button.highlight-button {
   & ~ .children button {
     background-color: var(--child-colour);
   }
+
+  & ~ .inline {
+    display: inline;
+  }
 }
 
 #page-title {
