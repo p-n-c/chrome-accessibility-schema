@@ -10,43 +10,55 @@
   --d: 0.25rem;
 }
 
-/* Global Styles */
+/* Global */
+
 ::selection {
   background-color: var(--fg-colour);
   color: var(--bg-colour);
 }
 
-/* Layout Components */
+/* Layout */
+
 body {
-  padding: calc(var(--d) * 4) calc(var(--d) * 4) 0;
-  position: relative;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
-  padding-top: calc(var(--d) * 28);
-  padding-bottom: calc(var(--d) * 16);
+  position: relative;
+  flex-grow: 1;
+  overflow: auto;
+  padding: calc(var(--d) * 4);
+
+  #schema-placeholder {
+    margin-top: calc(var(--d) * 46);
+  }
+
+  #schema-content {
+    margin-top: calc(var(--d) * 36);
+  }
 }
 
 header,
 footer {
   position: fixed;
-  width: 100% - calc(var(--d) * 4);
-  height: calc(var(--d) * 16);
+  left: 0;
+  width: 100%;
   background-color: var(--bg-colour);
-  display: flex;
+  color: var(--fg-colour);
+  padding: calc(var(--d) * 4);
+  z-index: 1;
 }
 
 header {
   top: 0;
-  flex-direction: column;
 }
 
 footer {
   bottom: 0;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.8;
 }
 
 nav {
@@ -62,11 +74,12 @@ h2 {
   margin: calc(var(--d) * 6) 0 calc(var(--d) * 2);
 }
 
+/* Controls */
+
 .controls {
   background-color: var(--bg-colour);
 }
 
-/* Button Styles */
 button {
   border: 1px solid var(--border-colour);
   padding: 5px 10px;
@@ -86,11 +99,7 @@ button.highlight-button {
   border: 1px solid var(--border-colour);
 }
 
-/* Schema Content Styles */
-
-#schema-placeholder {
-  margin-top: 4rem;
-}
+/* Schema */
 
 .children {
   margin-left: 1rem;
@@ -98,6 +107,15 @@ button.highlight-button {
 
 .node {
   margin: calc(var(--d)) 0;
+}
+
+.view-tabs button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .highlighter {
@@ -116,17 +134,9 @@ button.highlight-button {
 }
 
 .view-tabs {
-  border-bottom: 1px solid #ccc;
+  margin-right: calc(var(--d) * 8);
+  border-bottom: 1px solid var(--line-colour);
   padding: 0.5rem 1rem;
-}
-
-.view-tabs button {
-  padding: 0.5rem 1rem;
-  margin-right: 0.25rem;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-  background: transparent;
-  cursor: pointer;
 }
 
 .view-tabs button:hover {
@@ -140,7 +150,7 @@ button.highlight-button {
   background: var(--bg-colour);
 }
 
-/* Schema rules */
+/* Schema tab rules */
 
 .inline {
   display: inline;
@@ -151,22 +161,25 @@ button.highlight-button {
 }
 
 .schema {
-}
-
-[data-tag='html'],
-[data-tag='meta'],
-[data-tag='title'],
-[data-tag='head'],
-[data-tag='link'],
-[data-tag='style'] {
-  display: none;
-}
-
-div[data-tag^='h'] + div,
-div[data-tag='p'] + div {
-  display: inline-block;
-
-  .attribute {
+  .validation {
     display: none;
+  }
+
+  [data-tag='html'],
+  [data-tag='meta'],
+  [data-tag='title'],
+  [data-tag='head'],
+  [data-tag='link'],
+  [data-tag='style'] {
+    display: none;
+  }
+
+  div[data-tag^='h'] + div,
+  div[data-tag='p'] + div {
+    display: inline-block;
+
+    .attribute {
+      display: none;
+    }
   }
 }

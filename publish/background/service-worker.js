@@ -86,32 +86,23 @@ const scanCurrentPage = async () => {
   }
 }
 
-chrome.runtime.onInstalled.addListener(async () => {
-  chrome.action.onClicked.addListener(async (tab) => {
-    console.log('Visitor clicked on icon')
-    if (isSidePanelOpen) {
-      closeSidePanel()
-
-      // Toggle side panel visibility
-      isSidePanelOpen = !isSidePanelOpen
-    } else {
-      try {
-        await chrome.sidePanel.open({ windowId: tab.windowId })
-        isSidePanelOpen = true
-        schemaTabId = tab.id
-      } catch (error) {
-        console.error('Error opening side panel:', error)
-        isSidePanelOpen = false
-      }
-    }
-  })
+chrome.action.onClicked.addListener((tab) => {
+  console.log('Visitor clicked on icon')
+  if (isSidePanelOpen) {
+    closeSidePanel()
+  } else {
+    chrome.sidePanel.open({ windowId: tab.windowId })
+  }
+  // Toggle side panel visibility
+  isSidePanelOpen = !isSidePanelOpen
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
   if (isSidePanelOpen) scanCurrentPage()
 })
 
-chrome.tabs.onActivated.addListener(async () => {
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  console.log('Tab switched. New active tab ID:', activeInfo.tabId)
   if (isSidePanelOpen) closeSidePanel()
 
   // While the side panel is closed, this statement is always true
