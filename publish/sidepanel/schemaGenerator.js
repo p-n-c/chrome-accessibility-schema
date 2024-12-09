@@ -8,7 +8,6 @@ const schemaGenerator = {
         const match = paragraph.match(sentenceEndings)
 
         return match ? paragraph.slice(0, match.index + 1).trim() : paragraph
-        // str.length > len ? str.slice(0, 20) + '…' : str
         break
       default:
         return str
@@ -24,23 +23,23 @@ const schemaGenerator = {
     const children = tree?.children || []
     const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>${tree.tag}</button>`
 
-    let nodeText = `<div class='tag inline' data-tag='${tree.tag}'>${button} </div>`
+    let nodeText = `<summary class='tag' data-tag='${tree.tag}'>${button} </summary>`
 
     nodeText += '<div class="inline hidden">'
 
     if (tree.attributes.length != 0) {
       tree.attributes.forEach((attr) => {
-        nodeText += ` <span class='attribute'>${attr[0]}: ${attr[1]}</span>`
+        nodeText += ` <span class='attribute'><strong>${attr[0]}</strong>: ${attr[1]}</span>`
       })
     }
 
     if (tree.elementText.length != 0) {
-      nodeText += ` <span class='element-text'>${schemaGenerator.stringExtract({ str: tree.elementText, tag: tree.tag })}</span>`
+      nodeText += ` <span class='element-text'><strong>text</strong>: ${schemaGenerator.stringExtract({ str: tree.elementText, tag: tree.tag })}</span>`
     }
 
     if (tree.validation.length != 0) {
       tree.validation.forEach((item) => {
-        nodeText += ` <span class='validation'>${item.message}</span>`
+        nodeText += ` <span class='validation'><strong>validation</strong>:${item.message}</span>`
       })
     }
 
@@ -55,7 +54,7 @@ const schemaGenerator = {
       nodeText += `<div class="children">${childrenHtml}</div>`
     }
 
-    return `<div id='${tree.id}' class='node'>${nodeText}</div>`
+    return `<details open id='${tree.id}' class='node'>${nodeText}</details>`
   },
 
   generateSchemaHtml: (treeStructure) => {

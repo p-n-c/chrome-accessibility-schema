@@ -17,11 +17,13 @@ const highLightElement = (id) => {
   overlayElement.style.position = 'fixed'
   overlayElement.style.top = rect.top - padding + 'px'
   overlayElement.style.left = rect.left - padding + 'px'
+  overlayElement.style.borderRadius = '5px'
   overlayElement.style.width = rect.width + padding * 2 + 'px'
   overlayElement.style.height = rect.height + padding * 2 + 'px'
   overlayElement.style.boxSizing = 'border-box'
-  overlayElement.style.backgroundColor = 'red'
-  overlayElement.style.opacity = '.2'
+  overlayElement.style.backgroundColor = '#E6200A'
+  overlayElement.style.border = '1px solid black'
+  overlayElement.style.opacity = '.3'
   overlayElement.style.filter = overlayElement + ' blur(0.5px)' // Limit aliasing with mixBlendMode
 
   // Add a non-breaking space to ensure the element is not considered "empty"

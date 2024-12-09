@@ -4,7 +4,7 @@
   --border-colour: darkgrey;
   --child-colour: #eee;
   --line-colour: lightgrey;
-  --accent-colour: orange;
+  --accent-colour: #fbc1b9;
   --up: red;
   --down: green;
   --d: 0.25rem;
@@ -25,6 +25,8 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
 }
 
 main {
@@ -38,7 +40,7 @@ main {
   }
 
   #schema-content {
-    margin-top: calc(var(--d) * 36);
+    margin-top: calc(var(--d) * 46);
   }
 }
 
@@ -66,11 +68,12 @@ nav {
 }
 
 h1 {
+  margin-top: 0;
   font-size: 1.1rem;
 }
 
 h2 {
-  font-size: 1rem;
+  font-size: 0.8rem;
   margin: calc(var(--d) * 6) 0 calc(var(--d) * 2);
 }
 
@@ -90,13 +93,19 @@ button {
 }
 
 button.highlight-button {
-  margin: calc(var(--d) * 0.5) 0;
+  margin: calc(var(--d) * 0.5) 0 calc(var(--d) * 0.5) calc(var(--d) * 0.5);
   padding: var(--d) calc(var(--d) * 2);
   color: var(--fg-colour);
   background-color: var(--bg-colour);
   font-size: 14px;
   border-radius: 3px;
   border: 1px solid var(--border-colour);
+}
+
+a {
+  color: var(--fg-colour);
+  text-decoration: underline;
+  text-underline-offset: var(--d);
 }
 
 /* Schema */
@@ -118,10 +127,14 @@ button.highlight-button {
   cursor: pointer;
 }
 
+.inline {
+  display: inline;
+}
+
 .highlighter {
   button {
-    color: var(--bg-colour) !important;
-    background-color: var(--fg-colour) !important;
+    background-color: var(--accent-colour) !important;
+    border-color: var(--accent-colour) !important;
   }
 
   & ~ .children button {
@@ -154,11 +167,13 @@ button.highlight-button {
   background: var(--bg-colour);
 }
 
-/* Schema tab rules */
-
-.inline {
-  display: inline;
+.attribute,
+.element-text,
+.validation {
+  display: block;
 }
+
+/* Schema tab rules */
 
 .hidden {
   display: none;

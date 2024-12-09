@@ -1,13 +1,11 @@
 const LANDMARK_ELEMENTS = [
-  'banner',
-  'complementary',
-  'contentinfo',
-  'form',
-  'main',
-  'navigation',
-  'region',
-  'search',
-  'section',
+  'header', // Represents introductory content, typically a group of navigational or introductory elements
+  'nav', // Contains navigation links for the current document or other pages
+  'main', // Represents the dominant content of the body of a document
+  'article', // Represents a self-contained composition in a document, page, application, or site
+  'section', // Represents a standalone section of content
+  'aside', // Contains content that is tangentially related to the content around it
+  'footer', // Represents a footer for its nearest sectioning content or sectioning root element
 ]
 
 const HEADER_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
@@ -38,16 +36,20 @@ class SchemaFilter {
     // Reset all nodes to default state
     const allNodes = this.schemaContent.querySelectorAll('.node')
     allNodes.forEach((node) => (node.style.display = 'none'))
+
+    const body = document.querySelector('body')
+    body.classList.remove(...body.classList)
+    body.classList.add(view)
+
     switch (view) {
       case 'schema':
-        // Show everything for full schema
         allNodes.forEach((node) => (node.style.display = 'block'))
         break
-      case 'landmarks':
+      case 'rotor':
         this.showElements(LANDMARK_ELEMENTS)
         break
-      case 'headers':
-        this.showElements(HEADER_ELEMENTS)
+      case 'validation':
+        allNodes.forEach((node) => (node.style.display = 'block'))
         break
     }
   }
@@ -58,10 +60,10 @@ class SchemaFilter {
 
     landmarkNodes.forEach((node) => {
       const tagButton = node.querySelector('.highlight-button')
-      console.log(tagButton)
       if (tagButton) {
-        const tag = tagButton.getAttribute('data-tag').toLowerCase()
+        const tag = tagButton?.textContent?.toLowerCase()
         if (elementList.includes(tag)) {
+          console.log(tag)
           // Show this node and all its ancestor nodes
           this.showNodeAndParents(node)
         }
