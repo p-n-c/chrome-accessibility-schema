@@ -19,6 +19,7 @@ class SchemaFilter {
   setupEventListeners() {
     // Find all tab buttons
     const tabs = document.querySelectorAll('[role="tab"]')
+    const rotorsContainer = document.getElementById('rotor-rbs')
 
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -27,42 +28,70 @@ class SchemaFilter {
         tab.setAttribute('aria-selected', 'true')
 
         const view = tab.dataset.view
-        this.handleViewChange(view)
+        this.handleViewChange({ view, rotorsContainer, rotor: 'landmarks' })
+      })
+    })
+
+    const rotors = document
+      .getElementById('rotor-rbs')
+      .querySelectorAll('input')
+
+    rotors.forEach((rotor) => {
+      rotor.addEventListener('change', () => {
+        this.handleViewChange({
+          view: 'rotor',
+          rotorsContainer,
+          rotor: rotor.id,
+        })
       })
     })
   }
 
-  handleViewChange(view) {
+  handleViewChange({ view, rotorsContainer, rotor }) {
     // Reset all nodes to default state
-    const allNodes = this.schemaContent.querySelectorAll('.node')
-    allNodes.forEach((node) => (node.style.display = 'none'))
+    const nodes = Array.from(this.schemaContent.querySelectorAll('.node'))
+    nodes.forEach((node) => (node.style.display = 'none'))
 
+    // Set the body view class to match the selected tab view
     const body = document.querySelector('body')
     body.classList.remove(...body.classList)
-    body.classList.add(view)
+    body.classList.add(`${view}-view`)
 
     switch (view) {
       case 'schema':
-        allNodes.forEach((node) => (node.style.display = 'block'))
+        rotorsContainer.classList.add('hidden')
+        nodes.forEach((node) => (node.style.display = 'block'))
         break
       case 'rotor':
-        this.showElements(LANDMARK_ELEMENTS)
+        rotorsContainer.classList.remove('hidden')
+        switch (rotor) {
+          case 'landmarks':
+            this.showRotorElements(LANDMARK_ELEMENTS)
+            break
+          case 'headers':
+            this.showRotorElements(HEADER_ELEMENTS)
+            break
+        }
         break
       case 'validation':
-        allNodes.forEach((node) => (node.style.display = 'block'))
+        rotorsContainer.classList.add('hidden')
+        document
+          .querySelectorAll('.validation.hidden')
+          .forEach((e) => e.classList.remove('hidden'))
+        this.showValidationElements(nodes)
         break
     }
   }
 
-  showElements(elementList) {
+  showRotorElements(rotorList) {
     // Find all nodes with landmark elements
-    const landmarkNodes = this.schemaContent.querySelectorAll('.node')
+    const rotorNodes = this.schemaContent.querySelectorAll('.node')
 
-    landmarkNodes.forEach((node) => {
+    rotorNodes.forEach((node) => {
       const tagButton = node.querySelector('.highlight-button')
       if (tagButton) {
         const tag = tagButton?.textContent?.toLowerCase()
-        if (elementList.includes(tag)) {
+        if (rotorList.includes(tag)) {
           console.log(tag)
           // Show this node and all its ancestor nodes
           this.showNodeAndParents(node)
@@ -71,8 +100,31 @@ class SchemaFilter {
     })
   }
 
+  showValidationElements(nodes) {
+    // Find all elements that have validation errors
+    let validationNodes = Array.from(nodes).map((node) => {
+      const details = node.querySelector('details')
+      if (details) {
+        const validation = details.querySelector('.validation')
+        if (validation) {
+          return validation
+        } else {
+          node.style.display = 'none'
+        }
+      }
+    })
+
+    validationNodes = validationNodes.filter((n) => n !== undefined)
+    console.log('validationNodes ', validationNodes)
+    // Show all elements that have validation errors, and their parents
+    validationNodes.forEach((node) => {
+      this.showNodeAndParents(node)
+    })
+  }
+
   showNodeAndParents(node) {
     // Show the current node
+    console.log('node ', node)
     node.style.display = 'block'
 
     // Recursively show all parent nodes up to the root

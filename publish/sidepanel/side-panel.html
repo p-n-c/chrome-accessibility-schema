@@ -8,14 +8,14 @@
   </head>
   <!doctype html>
 
-  <body class="schema">
+  <body class="schema-view">
     <header>
       <h1>Accessibility Schema Validation</h1>
       <div>Review and validate web page schemas.</div>
       <div class="title">
         <h2 id="title-content">Title: <span id="page-title"></span></h2>
       </div>
-      <nav class="view-tabs" role="tablist">
+      <nav id="view-tabs" class="view-tabs" role="tablist" tabindex="0">
         <button role="tab" aria-selected="false" data-view="schema">
           Schema
         </button>
@@ -25,12 +25,22 @@
         <button role="tab" aria-selected="false" data-view="validation">
           Validation
         </button>
-        <!-- <button role="tab" aria-selected="false" data-view="landmarks">
-          Landmarks
-        </button>
-        <button role="tab" aria-selected="false" data-view="headers">
-          Headers
-        </button> -->
+      </nav>
+      <nav id="rotor-rbs" class="rotor-rbs hidden">
+        <div>
+          <label for="landmarks">Landmarks</label>
+          <input
+            type="radio"
+            name="rotor"
+            id="landmarks"
+            data-view="landmarks"
+            checked="checked"
+          />
+        </div>
+        <div>
+          <label for="headers">Headers</label>
+          <input type="radio" name="rotor" id="headers" data-view="headers" />
+        </div>
       </nav>
     </header>
     <main>

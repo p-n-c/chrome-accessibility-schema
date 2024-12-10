@@ -25,21 +25,21 @@ const schemaGenerator = {
 
     let nodeText = `<summary class='tag' data-tag='${tree.tag}'>${button} </summary>`
 
-    nodeText += '<div class="inline hidden">'
+    nodeText += '<div class="inline">'
 
     if (tree.attributes.length != 0) {
       tree.attributes.forEach((attr) => {
-        nodeText += ` <span class='attribute'><strong>${attr[0]}</strong>: ${attr[1]}</span>`
+        nodeText += ` <span class='attribute hidden'><strong>${attr[0]}</strong>: ${attr[1]}</span>`
       })
     }
 
     if (tree.elementText.length != 0) {
-      nodeText += ` <span class='element-text'><strong>text</strong>: ${schemaGenerator.stringExtract({ str: tree.elementText, tag: tree.tag })}</span>`
+      nodeText += ` <span class='element-text hidden'><strong>text</strong>: ${schemaGenerator.stringExtract({ str: tree.elementText, tag: tree.tag })}</span>`
     }
 
     if (tree.validation.length != 0) {
       tree.validation.forEach((item) => {
-        nodeText += ` <span class='validation'><strong>validation</strong>:${item.message}</span>`
+        nodeText += ` <span class='validation hidden'><strong>validation</strong>: ${item.message}</span>`
       })
     }
 

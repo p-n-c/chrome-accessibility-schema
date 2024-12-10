@@ -5,6 +5,7 @@
   --child-colour: #eee;
   --line-colour: lightgrey;
   --accent-colour: #fbc1b9;
+  --alert-colour: red;
   --up: red;
   --down: green;
   --d: 0.25rem;
@@ -41,6 +42,13 @@ main {
 
   #schema-content {
     margin-top: calc(var(--d) * 46);
+    margin-bottom: calc(var(--d) * 12);
+  }
+}
+
+body.rotor {
+  #schema-content {
+    margin-top: calc(var(--d) * 50);
   }
 }
 
@@ -125,6 +133,16 @@ a {
   cursor: pointer;
 }
 
+.rotor-rbs div {
+  padding: 0.5rem 0 0 1rem;
+  display: flex;
+  align-items: center;
+
+  input {
+    accent-color: var(--fg-colour);
+  }
+}
+
 .inline {
   display: inline;
 }
@@ -148,10 +166,15 @@ a {
   font-weight: normal;
 }
 
-.view-tabs {
+.view-tabs,
+.rotor-rbs {
   margin-right: calc(var(--d) * 8);
-  padding: 0 1rem 0.5rem;
-  border-bottom: 1px solid var(--line-colour);
+  padding: 0;
+}
+
+.rotor-rbs {
+  display: flex;
+  align-items: center;
 }
 
 .view-tabs button:hover {
@@ -169,6 +192,7 @@ a {
 .element-text,
 .validation {
   display: block;
+  margin: var(--d) calc(var(--d) * 4);
 }
 
 /* Schema tab rules */
@@ -177,7 +201,7 @@ a {
   display: none;
 }
 
-.schema {
+.schema-view {
   .validation {
     display: none;
   }
@@ -199,4 +223,15 @@ a {
       display: none;
     }
   }
+}
+
+.rotor-view,
+.validation-view {
+  [data-tag='html'] {
+    display: none;
+  }
+}
+
+.validation strong {
+  color: var(--alert-colour);
 }

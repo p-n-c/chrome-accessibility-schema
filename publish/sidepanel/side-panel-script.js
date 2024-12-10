@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('contextmenu', () => {
     let selection = document.getSelection()
-    if (selection.anchorNode.parentElement.classList.contains('tag')) {
+    if (selection.anchorNode?.parentElement?.classList?.contains('tag')) {
       extendSelectionToWord(selection)
     }
   })
