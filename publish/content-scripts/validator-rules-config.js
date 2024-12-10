@@ -110,6 +110,15 @@ const rulesConfig = {
           message: 'Elements with sources must have non-empty src attribute',
           details: { requiredAttributes: ['src'] },
         },
+        {
+          selector: 'label',
+          validate: (element) => {
+            const forAttribute = element.getAttribute('for')
+            return forAttribute && forAttribute.trim().length > 0
+          },
+          message: 'The label element must have a for attribute',
+          details: { requiredAttributes: ['for'] },
+        },
       ],
     },
     {

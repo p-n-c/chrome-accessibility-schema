@@ -103,14 +103,11 @@ class SchemaFilter {
   showValidationElements(nodes) {
     // Find all elements that have validation errors
     let validationNodes = Array.from(nodes).map((node) => {
-      const details = node.querySelector('details')
-      if (details) {
-        const validation = details.querySelector('.validation')
-        if (validation) {
-          return validation
-        } else {
-          node.style.display = 'none'
-        }
+      const validation = node.querySelector('.validation')
+      if (validation) {
+        return validation
+      } else {
+        node.style.display = 'none'
       }
     })
 

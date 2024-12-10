@@ -68,6 +68,23 @@ describe('HTMLValidator', () => {
     expect(results.length).toBe(0)
   })
 
+  test('The label element must have a for attribute', () => {
+    container.innerHTML = `
+      <label>
+    `
+    let results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(1)
+    results.forEach((result) => {
+      expect(result.message).toBe('The label element must have a for attribute')
+    })
+
+    container.innerHTML = `
+      <label for="someId">
+    `
+    results = validator.validate('element', 'attributePresence')
+    expect(results.length).toBe(0)
+  })
+
   test('Buttons and interactive elements must have text content', () => {
     container.innerHTML = `
       <button></button>
