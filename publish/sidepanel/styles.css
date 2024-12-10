@@ -74,13 +74,13 @@ h1 {
 
 h2 {
   font-size: 0.8rem;
-  margin: calc(var(--d) * 6) 0 calc(var(--d) * 2);
+  margin: calc(var(--d) * 4) 0;
 }
 
-/* Controls */
-
-.controls {
+.title {
   background-color: var(--bg-colour);
+  padding: 0 1rem;
+  line-height: 1.8;
 }
 
 button {
@@ -107,8 +107,6 @@ a {
   text-decoration: underline;
   text-underline-offset: var(--d);
 }
-
-/* Schema */
 
 .children {
   margin-left: 1rem;
@@ -152,8 +150,8 @@ a {
 
 .view-tabs {
   margin-right: calc(var(--d) * 8);
+  padding: 0 1rem 0.5rem;
   border-bottom: 1px solid var(--line-colour);
-  padding: 0.5rem 1rem;
 }
 
 .view-tabs button:hover {

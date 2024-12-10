@@ -1,11 +1,17 @@
 let schemaTabId = undefined
 let isSidePanelOpen = false
+let elementId = false
 
 const closeSidePanel = async () => {
   try {
     chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
+    })
+    chrome.tabs.sendMessage(schemaTabId, {
+      from: 'service-worker',
+      message: 'highlight',
+      elementId,
     })
     schemaTabId = undefined
   } catch (error) {
@@ -116,11 +122,9 @@ chrome.runtime.onMessage.addListener(async (message) => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
     schemaTabId = currentTab.id
+    elementId = message.elementId
 
     switch (message.message) {
-      case 'closing':
-        schemaTabId = undefined
-        break
       case 'loaded':
         scanCurrentPage()
         break
