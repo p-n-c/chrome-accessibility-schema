@@ -440,8 +440,8 @@ const rulesConfig = {
    *       const meta = document.querySelector('meta[name="description"]');
    *       const content = meta?.getAttribute('content');
    *       return !content
-   *         ? 'Meta description is required'
-   *         : `Meta description must be between 50-160 characters (currently ${content.length})`;
+   *         ? 'A meta description is required'
+   *         : `We recommend a meta description between 50 and 160 characters (currently ${content.length})`;
    *     }
    *   }]
    * }
@@ -496,8 +496,8 @@ const rulesConfig = {
             const meta = document.querySelector('meta[name="description"]')
             const content = meta?.getAttribute('content')
             return !content
-              ? 'Meta description is required'
-              : `Meta description must be between 50-160 characters (currently ${content.length})`
+              ? 'A meta description is required'
+              : `We recommend a meta description between 50 and 160 characters (currently ${content.length})`
           },
         },
         {

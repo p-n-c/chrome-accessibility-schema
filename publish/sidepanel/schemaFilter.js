@@ -60,10 +60,12 @@ class SchemaFilter {
     switch (view) {
       case 'schema':
         rotorsContainer.classList.add('hidden')
+        this.hideValidation()
         nodes.forEach((node) => (node.style.display = 'block'))
         break
       case 'rotor':
         rotorsContainer.classList.remove('hidden')
+        this.hideValidation()
         switch (rotor) {
           case 'landmarks':
             this.showRotorElements(LANDMARK_ELEMENTS)
@@ -81,6 +83,15 @@ class SchemaFilter {
         this.showValidationElements(nodes)
         break
     }
+  }
+
+  hideValidation() {
+    document.querySelectorAll('.validation').forEach((e) => {
+      if (!e.classList.contains('hidden')) {
+        e.classList.add('hidden')
+        e.style.display = ''
+      }
+    })
   }
 
   showRotorElements(rotorList) {
@@ -112,7 +123,6 @@ class SchemaFilter {
     })
 
     validationNodes = validationNodes.filter((n) => n !== undefined)
-    console.log('validationNodes ', validationNodes)
     // Show all elements that have validation errors, and their parents
     validationNodes.forEach((node) => {
       this.showNodeAndParents(node)
@@ -121,7 +131,6 @@ class SchemaFilter {
 
   showNodeAndParents(node) {
     // Show the current node
-    console.log('node ', node)
     node.style.display = 'block'
 
     // Recursively show all parent nodes up to the root

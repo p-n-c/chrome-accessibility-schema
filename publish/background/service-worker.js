@@ -31,7 +31,6 @@ const executeScriptAndSendMessage = async ({
       func,
     })
     const result = answers[0].result
-
     const sendMessage =
       (result && Object.keys(result).length !== 0) || forceSendMessage
 
@@ -63,14 +62,14 @@ const scanCurrentPage = async () => {
 
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
-
     if (permittedProtocols.includes(tabProtocol)) {
-      schemaTabId = currentTab.id
+      schemaTabId = currentTab?.id
       const treeResult = await executeScriptAndSendMessage({
         tabId: schemaTabId,
         func: runTreeBuilder,
         messageType: 'tree',
       })
+
       if (treeResult) {
         await executeScriptAndSendMessage({
           tabId: schemaTabId,
@@ -104,11 +103,14 @@ chrome.action.onClicked.addListener((tab) => {
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
-  if (isSidePanelOpen) scanCurrentPage()
+  if (isSidePanelOpen) {
+    if (changeInfo.status === 'complete') {
+      scanCurrentPage()
+    }
+  }
 })
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  console.log('Tab switched. New active tab ID:', activeInfo.tabId)
   if (isSidePanelOpen) closeSidePanel()
 
   // While the side panel is closed, this statement is always true
@@ -121,7 +123,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
-    schemaTabId = currentTab.id
+    schemaTabId = currentTab?.id
     elementId = message.elementId
 
     switch (message.message) {

@@ -5,9 +5,14 @@ function displaySchema(schemaHtml) {
   const schemaPlaceholder = document.getElementById('schema-placeholder')
   const schemaContainer = document.getElementById('schema-content')
 
-  schemaPlaceholder.classList.toggle('hidden')
-  schemaContainer.classList.toggle('hidden')
-  schemaContainer.innerHTML = `${schemaHtml}`
+  if (schemaHtml.length > 0) {
+    schemaPlaceholder.classList.add('hidden')
+    schemaContainer.classList.remove('hidden')
+    schemaContainer.innerHTML = `${schemaHtml}`
+  } else {
+    schemaPlaceholder.classList.remove('hidden')
+    schemaContainer.classList.add('hidden')
+  }
 
   document
     .querySelector('[data-view="schema"]')
@@ -123,6 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           break
         case 'reset-schema':
+          const schemaPlaceholder =
+            document.getElementById('schema-placeholder')
+          const schemaContainer = document.getElementById('schema-content')
+
           schemaPlaceholder.classList.toggle('hidden')
           schemaContainer.classList.toggle('hidden')
           break

@@ -157,8 +157,8 @@ a {
     background-color: var(--child-colour);
   }
 
-  & ~ .inline {
-    display: inline;
+  & ~ .inline span {
+    display: inline-block;
   }
 }
 
