@@ -19,7 +19,6 @@ class SchemaFilter {
   setupEventListeners() {
     // Find all tab buttons
     const tabs = document.querySelectorAll('[role="tab"]')
-    const rotorsContainer = document.getElementById('rotor-rbs')
 
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -28,7 +27,7 @@ class SchemaFilter {
         tab.setAttribute('aria-selected', 'true')
 
         const view = tab.dataset.view
-        this.handleViewChange({ view, rotorsContainer, rotor: 'landmarks' })
+        this.handleViewChange({ view, rotor: 'landmarks' })
       })
     })
 
@@ -40,14 +39,13 @@ class SchemaFilter {
       rotor.addEventListener('change', () => {
         this.handleViewChange({
           view: 'rotor',
-          rotorsContainer,
           rotor: rotor.id,
         })
       })
     })
   }
 
-  handleViewChange({ view, rotorsContainer, rotor }) {
+  handleViewChange({ view, rotor }) {
     // Reset all nodes to default state
     const nodes = Array.from(this.schemaContent.querySelectorAll('.node'))
     nodes.forEach((node) => (node.style.display = 'none'))
@@ -59,12 +57,10 @@ class SchemaFilter {
 
     switch (view) {
       case 'schema':
-        rotorsContainer.classList.add('hidden')
         this.hideValidation()
         nodes.forEach((node) => (node.style.display = 'block'))
         break
       case 'rotor':
-        rotorsContainer.classList.remove('hidden')
         this.hideValidation()
         switch (rotor) {
           case 'landmarks':
@@ -76,7 +72,6 @@ class SchemaFilter {
         }
         break
       case 'validation':
-        rotorsContainer.classList.add('hidden')
         document
           .querySelectorAll('.validation.hidden')
           .forEach((e) => e.classList.remove('hidden'))
@@ -103,7 +98,6 @@ class SchemaFilter {
       if (tagButton) {
         const tag = tagButton?.textContent?.toLowerCase()
         if (rotorList.includes(tag)) {
-          console.log(tag)
           // Show this node and all its ancestor nodes
           this.showNodeAndParents(node)
         }

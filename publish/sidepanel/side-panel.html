@@ -13,20 +13,47 @@
       <h1>Accessibility Schema Validation</h1>
       <div>Review and validate web page schemas.</div>
       <div class="title">
-        <h2 id="title-content">Title: <span id="page-title"></span></h2>
+        <h2>Title: <span id="page-title"></span></h2>
       </div>
       <nav id="view-tabs" class="view-tabs" role="tablist" tabindex="0">
-        <button role="tab" aria-selected="false" data-view="schema">
+        <button
+          id="schema-tab"
+          role="tab"
+          aria-selected="false"
+          data-view="schema"
+          aria-controls="schema-subtext"
+          tabindex="-1"
+        >
           Schema
         </button>
-        <button role="tab" aria-selected="false" data-view="rotor">
+        <button
+          id="rotor-tab"
+          role="tab"
+          aria-selected="false"
+          data-view="rotor"
+          aria-controls="rotor-rbs"
+          tabindex="-1"
+        >
           Rotor
         </button>
-        <button role="tab" aria-selected="false" data-view="validation">
+        <button
+          id="validation-tab"
+          role="tab"
+          aria-selected="false"
+          data-view="validation"
+          aria-controls="validation-subtext"
+          tabindex="-1"
+        >
           Validation
         </button>
       </nav>
-      <nav id="rotor-rbs" class="rotor-rbs hidden">
+      <div
+        id="rotor-rbs"
+        class="rotor-rbs hidden"
+        aria-labelledby="schema-tab"
+        role="tabpanel"
+        tabindex="0"
+      >
         <div>
           <label for="landmarks">Landmarks</label>
           <input
@@ -41,13 +68,31 @@
           <label for="headers">Headers</label>
           <input type="radio" name="rotor" id="headers" data-view="headers" />
         </div>
-      </nav>
-    </header>
-    <main>
-      <div id="schema-placeholder">
+      </div>
+      <div
+        id="schema-subtext"
+        class="schema-subtext hidden"
+        aria-labelledby="rotor-tab"
+        role="tabpanel"
+        tabindex="0"
+      >
+        Schema max depth: 0
+      </div>
+      <div
+        id="validation-subtext"
+        class="validation-subtext hidden"
+        aria-labelledby="validation-tab"
+        role="tabpanel"
+        tabindex="0"
+      >
+        Validation errors: 0
+      </div>
+      <div id="schema-placeholder" class="schema-placeholder" role="tabpanel">
         No schema to display, please load a valid page.
       </div>
-      <div id="schema-content" class="hidden"></div>
+    </header>
+    <main>
+      <div id="schema-content"></div>
     </main>
     <footer>
       Accessibility schema validation by
