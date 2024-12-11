@@ -19,7 +19,7 @@ const schemaGenerator = {
     container.innerHTML = htmlString.trim()
     return container
   },
-  generateTreeHtml: (tree, depth) => {
+  generateTreeHtml: (tree) => {
     const children = tree?.children || []
     const button = `<button type='button' title='Highlight in page' data-treeid='${tree.id}' class='highlight-button'>${tree.tag}</button>`
 
@@ -47,11 +47,9 @@ const schemaGenerator = {
 
     // Insert children
     if (children.length > 0) {
-      depth++
-      // console.log('depth ', depth)
       let childrenHtml = ''
       for (const child of children) {
-        childrenHtml += schemaGenerator.generateTreeHtml(child, depth)
+        childrenHtml += schemaGenerator.generateTreeHtml(child)
       }
       nodeText += `<div class="children">${childrenHtml}</div>`
     }
@@ -61,11 +59,10 @@ const schemaGenerator = {
 
   generateSchemaHtml: (treeStructure) => {
     let htmlOutput = ''
-    let depth = 0
 
     // Handle the case of multiple root elements
     for (const tree of treeStructure) {
-      htmlOutput += schemaGenerator.generateTreeHtml(tree, depth)
+      htmlOutput += schemaGenerator.generateTreeHtml(tree)
     }
 
     return schemaGenerator.htmlStringToDomElement(htmlOutput)

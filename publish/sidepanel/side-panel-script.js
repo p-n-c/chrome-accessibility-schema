@@ -64,6 +64,29 @@ function mergeValidationResults(tree, validationResults) {
   return tree
 }
 
+function calculateHTMLDepth(rootElement) {
+  const parser = new DOMParser()
+  const root = parser.parseFromString(rootElement, 'text/html').body
+
+  let maxDepth = 0
+
+  function traverse(element, currentNesting) {
+    if (currentNesting > maxDepth) {
+      maxDepth = currentNesting
+    }
+
+    for (let child of element.children) {
+      const nesting = child?.classList?.contains('node')
+        ? currentNesting + 1
+        : currentNesting
+      traverse(child, nesting)
+    }
+  }
+
+  traverse(root, 0)
+  return maxDepth
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Contains the processed tree with validation messages - Global for easy query in console
   window.tree = undefined
@@ -97,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(window.tree)
           displaySchema(schemaHtml.outerHTML)
+          document.getElementById('max-depth').innerText = calculateHTMLDepth(
+            schemaHtml.outerHTML
+          )
           // Highlight buttons
           const askForHighlight = (id) => {
             chrome.runtime.sendMessage({
