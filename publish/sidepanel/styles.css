@@ -206,7 +206,7 @@ a {
 
 .schema-view {
   .validation {
-    display: none;
+    display: none !important;
   }
 
   [data-tag='html'],
@@ -232,6 +232,12 @@ a {
 .validation-view {
   [data-tag='html'] {
     display: none;
+  }
+}
+
+.rotor-view {
+  .validation {
+    display: none !important;
   }
 }
 

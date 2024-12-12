@@ -82,7 +82,7 @@ class SchemaFilter {
     // Scroll to highlighted element
     document
       .querySelector('.tag.highlighter')
-      .scrollIntoView({ behavior: 'smooth', block: 'center' })
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   hideValidation() {
