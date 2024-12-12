@@ -2,18 +2,20 @@ const schemaGenerator = {
   stringExtract: ({ str, len = 20, tag }) => {
     switch (tag) {
       case 'p':
+      case 'div':
+      case 'span':
+      case 'section':
+      case 'li':
         const sentenceEndings = /[.!?]/
         const paragraph = str.trim()
 
         const match = paragraph.match(sentenceEndings)
 
         return match ? paragraph.slice(0, match.index + 1).trim() : paragraph
-        break
       default:
         return str
     }
   },
-
   htmlStringToDomElement: (htmlString) => {
     const container = document.createElement('div')
     container.innerHTML = htmlString.trim()
@@ -56,7 +58,6 @@ const schemaGenerator = {
 
     return `<details open id='${tree.id}' class='node'>${nodeText}</details>`
   },
-
   generateSchemaHtml: (treeStructure) => {
     let htmlOutput = ''
 
