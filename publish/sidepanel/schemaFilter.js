@@ -27,7 +27,8 @@ class SchemaFilter {
         tab.setAttribute('aria-selected', 'true')
 
         const view = tab.dataset.view
-        this.handleViewChange({ view, rotor: 'landmarks' })
+        const rotor = document.querySelector('.rotor-rbs input:checked').id
+        this.handleViewChange({ view, rotor })
       })
     })
 
