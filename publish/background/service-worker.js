@@ -103,17 +103,16 @@ chrome.action.onClicked.addListener((tab) => {
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
-  if (isSidePanelOpen) {
-    if (changeInfo.status === 'complete') {
-      scanCurrentPage()
-    }
+  if (changeInfo.status === 'complete') {
+    scanCurrentPage()
   }
 })
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  if (isSidePanelOpen) closeSidePanel()
-
-  // While the side panel is closed, this statement is always true
+  console.log('Tab switched. New active tab ID:', activeInfo.tabId)
+  // Close the side panel
+  closeSidePanel()
+  // And therefore set panel closed to true
   isSidePanelOpen = false
 })
 
