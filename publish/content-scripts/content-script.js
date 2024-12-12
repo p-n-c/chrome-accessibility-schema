@@ -25,6 +25,7 @@ const highLightElement = (id) => {
   overlayElement.style.border = '1px solid black'
   overlayElement.style.opacity = '.3'
   overlayElement.style.filter = overlayElement + ' blur(0.5px)' // Limit aliasing with mixBlendMode
+  overlayElement.style.pointerEvents = 'none'
 
   // Add a non-breaking space to ensure the element is not considered "empty"
   overlayElement.innerHTML = '&nbsp;'

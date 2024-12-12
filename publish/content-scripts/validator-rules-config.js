@@ -71,7 +71,7 @@ const rulesConfig = {
       type: 'attributePresence',
       rules: [
         {
-          selector: 'img, area, iframe',
+          selector: 'img, area',
           validate: (element) => element.hasAttribute('alt'),
           message: 'Elements that represent content must have alt text',
           details: { requiredAttributes: ['alt'] },
