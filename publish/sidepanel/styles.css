@@ -147,8 +147,8 @@ a {
 
 .highlighter {
   button {
-    background-color: var(--accent-colour) !important;
-    border-color: var(--accent-colour) !important;
+    background-color: var(--accent-colour);
+    border-color: var(--accent-colour);
   }
 
   & ~ .children button {
