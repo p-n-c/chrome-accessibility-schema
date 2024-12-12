@@ -71,10 +71,14 @@ function calculateHTMLDepth(rootElement) {
   let maxDepth = 0
 
   function traverse(element, currentNesting) {
+    // If the current nesting values is higher than out current maximum, we update the maximum
     if (currentNesting > maxDepth) {
       maxDepth = currentNesting
     }
 
+    // If there are children, we increment the current nesting count
+    // Otherwise, we keep the same value and keep checking
+    // When we reach a dead end, the current nesting value will be reset to 0
     for (let child of element.children) {
       const nesting = child?.classList?.contains('node')
         ? currentNesting + 1

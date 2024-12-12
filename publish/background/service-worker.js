@@ -4,14 +4,14 @@ let elementId = false
 
 const closeSidePanel = async () => {
   try {
-    chrome.runtime.sendMessage({
-      from: 'service-worker',
-      message: 'close-side-panel',
-    })
     chrome.tabs.sendMessage(schemaTabId, {
       from: 'service-worker',
       message: 'highlight',
       elementId,
+    })
+    chrome.runtime.sendMessage({
+      from: 'service-worker',
+      message: 'close-side-panel',
     })
     schemaTabId = undefined
   } catch (error) {
@@ -31,6 +31,7 @@ const executeScriptAndSendMessage = async ({
       func,
     })
     const result = answers[0].result
+    // When validating, there may be no result to check (0 errors)
     const sendMessage =
       (result && Object.keys(result).length !== 0) || forceSendMessage
 
@@ -54,22 +55,25 @@ const scanCurrentPage = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
 
+    // Find the page meta title
     await chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'title',
-      content: currentTab.title,
+      content: currentTab?.title,
     })
 
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
     if (permittedProtocols.includes(tabProtocol)) {
       schemaTabId = currentTab?.id
+      // Build the schema tree
       const treeResult = await executeScriptAndSendMessage({
         tabId: schemaTabId,
         func: runTreeBuilder,
         messageType: 'tree',
       })
 
+      // Once the tree has been built, validate it
       if (treeResult) {
         await executeScriptAndSendMessage({
           tabId: schemaTabId,
@@ -92,7 +96,7 @@ const scanCurrentPage = async () => {
 }
 
 chrome.action.onClicked.addListener((tab) => {
-  console.log('Visitor clicked on icon')
+  // Visitor clicks on the extension icon
   if (isSidePanelOpen) {
     closeSidePanel()
   } else {
@@ -109,26 +113,25 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
 })
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  console.log('Tab switched. New active tab ID:', activeInfo.tabId)
-  // Close the side panel
+  // When the visitor goes to another tab, we close the panel
   closeSidePanel()
-  // And therefore set panel closed to true
+  // And set panel closed to true
   isSidePanelOpen = false
 })
 
 chrome.runtime.onMessage.addListener(async (message) => {
   if (message.from === 'side-panel') {
-    console.log(`Message from ${message.from}: ${message.message}`)
-
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
     schemaTabId = currentTab?.id
     elementId = message.elementId
 
     switch (message.message) {
+      // When the page loads, we built the schema tree
       case 'loaded':
         scanCurrentPage()
         break
+      // When the visitor clicks on an element in the schema, we highlight it the page
       case 'highlight':
         chrome.tabs.sendMessage(schemaTabId, {
           from: 'service-worker',
@@ -136,14 +139,11 @@ chrome.runtime.onMessage.addListener(async (message) => {
           elementId: message.elementId,
         })
         break
-      default:
-        // do nothing
-        break
     }
   }
 })
 
-// Content script injections
+// Content script injections (see manifest)
 const runTreeBuilder = () => {
   return treeBuilder.htmlDocumentToTree()
 }
