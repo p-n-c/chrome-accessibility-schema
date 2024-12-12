@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "chrome-accessibility-schema",
-  "version": "0.0.0.1",
-  "permissions": ["activeTab", "sidePanel", "scripting", "contextMenus"],
+  "version": "0.0.0.2",
+  "permissions": ["activeTab", "sidePanel", "scripting"],
   "incognito": "split",
   "host_permissions": ["http://*/*", "https://*/*"],
   "background": {

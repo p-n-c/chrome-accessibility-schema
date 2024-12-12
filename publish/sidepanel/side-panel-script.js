@@ -165,21 +165,21 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   // MDN Context menu
-  chrome.contextMenus.create(
-    {
-      id: 'mdn-consult',
-      title: 'Search MDN for "%s"',
-      contexts: ['selection'],
-      documentUrlPatterns: [
-        `chrome-extension://${chrome.runtime.id}/sidepanel/side-panel.html`,
-      ],
-    },
-    () => {
-      if (chrome.runtime.lastError) {
-        // The menu item already exists, we can safely ignore this error
-      }
-    }
-  )
+  // chrome.contextMenus.create(
+  //   {
+  //     id: 'mdn-consult',
+  //     title: 'Search MDN for "%s"',
+  //     contexts: ['selection'],
+  //     documentUrlPatterns: [
+  //       `chrome-extension://${chrome.runtime.id}/sidepanel/side-panel.html`,
+  //     ],
+  //   },
+  //   () => {
+  //     if (chrome.runtime.lastError) {
+  //       // The menu item already exists, we can safely ignore this error
+  //     }
+  //   }
+  // )
 
   const schemaFilter = new SchemaFilter()
 
@@ -189,16 +189,16 @@ document.addEventListener('DOMContentLoaded', () => {
       extendSelectionToWord(selection)
     }
   })
-  chrome.contextMenus.onClicked.addListener(function (info) {
-    if (info.menuItemId === 'mdn-consult') {
-      const selection = document.getSelection()
-      const selectedText = selection.toString()
-      openOrReloadWindow(
-        `https://developer.mozilla.org/en-US/docs/Web/HTML/Element/${selectedText}`,
-        'mdn-from-sidepanel'
-      )
-    }
-  })
+  // chrome.contextMenus.onClicked.addListener(function (info) {
+  //   if (info.menuItemId === 'mdn-consult') {
+  //     const selection = document.getSelection()
+  //     const selectedText = selection.toString()
+  //     openOrReloadWindow(
+  //       `https://developer.mozilla.org/en-US/docs/Web/HTML/Element/${selectedText}`,
+  //       'mdn-from-sidepanel'
+  //     )
+  //   }
+  // })
 
   handleTabs()
 })

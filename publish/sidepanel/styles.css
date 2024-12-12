@@ -78,7 +78,7 @@ h2 {
 .title {
   display: flex;
   align-items: center;
-  min-height: calc(var(--d) * 12);
+  min-height: calc(var(--d) * 20);
   line-height: 1.8;
   padding: 0 1rem 0 0;
   background-color: var(--bg-colour);
@@ -135,6 +135,7 @@ a {
   }
 
   input {
+    margin: 0 1rem 0 0.5rem;
     accent-color: var(--fg-colour);
     cursor: pointer;
   }
