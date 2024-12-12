@@ -127,11 +127,11 @@ chrome.runtime.onMessage.addListener(async (message) => {
     elementId = message.elementId
 
     switch (message.message) {
-      // When the page loads, we built the schema tree
+      // When the page loads, we build the schema tree
       case 'loaded':
         scanCurrentPage()
         break
-      // When the visitor clicks on an element in the schema, we highlight it the page
+      // When the visitor clicks on an element in the schema, we highlight it on the page
       case 'highlight':
         chrome.tabs.sendMessage(schemaTabId, {
           from: 'service-worker',
