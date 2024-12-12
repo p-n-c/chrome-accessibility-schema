@@ -68,6 +68,7 @@ const treeElements = [
   'span',
   'style',
   'summary',
+  'svg',
   'table',
   'tbody',
   'td',
