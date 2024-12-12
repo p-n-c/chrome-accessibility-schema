@@ -123,10 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
           mergeValidationResults(window.tree, validationResults)
           // Inject the tree into the sidepanel
           const schemaHtml = window.generateSchemaHtml(window.tree)
+          // Display schema in the side panel
           displaySchema(schemaHtml.outerHTML)
+          // Show the maximum nesting depth (schema tab)
           document.getElementById('max-depth').innerText = calculateHTMLDepth(
             schemaHtml.outerHTML
           )
+          // Show the validation errors count (validation tab)
+          document.getElementById('validation-errors-count').innerText =
+            document.querySelectorAll('.validation').length
           // Highlight buttons
           const askForHighlight = (id) => {
             chrome.runtime.sendMessage({
