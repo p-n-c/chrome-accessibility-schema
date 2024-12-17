@@ -1,7 +1,8 @@
 # Schema Validation
 
 Review and validate web page schemas.  
-A Chrome extension created by [People and Code](https://people-and-code.com/).
+A Chrome extension created by [People and Code](https://people-and-code.com/).  
+Available on [Chrome extensions](https://chromewebstore.google.com/detail/chrome-accessibility-sche/injdhabbnkaocehlomocfejkofnboamk).
 
 ## Features
 
