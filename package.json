@@ -1,6 +1,6 @@
 {
   "name": "chrome-schema-validation",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Side panel that displays the schema of the current page and offers different information and warning regarding accessibility and cybersecurity",
   "author": "People and Code",
   "type": "module",
