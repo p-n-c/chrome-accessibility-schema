@@ -1,19 +1,25 @@
-let schemaTabId = undefined
-let isSidePanelOpen = false
-let elementId = false
+const storageCache = {
+  schemaTabId: undefined,
+  isSidePanelOpen: false,
+  elementId: false,
+}
+
+const initStorageCache = chrome.storage.local.get().then((items) => {
+  Object.assign(storageCache, items)
+})
 
 const closeSidePanel = async () => {
   try {
-    chrome.tabs.sendMessage(schemaTabId, {
+    chrome.tabs.sendMessage(storageCache.schemaTabId, {
       from: 'service-worker',
       message: 'highlight',
-      elementId,
+      elementId: storageCache.elementId,
     })
     chrome.runtime.sendMessage({
       from: 'service-worker',
       message: 'close-side-panel',
     })
-    schemaTabId = undefined
+    storageCache.schemaTabId = undefined
   } catch (error) {
     console.error(error)
   }
@@ -65,10 +71,10 @@ const scanCurrentPage = async () => {
     const permittedProtocols = ['http:', 'https:']
     const tabProtocol = new URL(currentTab.url)?.protocol
     if (permittedProtocols.includes(tabProtocol)) {
-      schemaTabId = currentTab?.id
+      storageCache.schemaTabId = currentTab?.id
       // Build the schema tree
       const treeResult = await executeScriptAndSendMessage({
-        tabId: schemaTabId,
+        tabId: storageCache.schemaTabId,
         func: runTreeBuilder,
         messageType: 'tree',
       })
@@ -76,7 +82,7 @@ const scanCurrentPage = async () => {
       // Once the tree has been built, validate it
       if (treeResult) {
         await executeScriptAndSendMessage({
-          tabId: schemaTabId,
+          tabId: storageCache.schemaTabId,
           func: runValidator,
           messageType: 'validation',
           forceSendMessage: true,
@@ -95,36 +101,47 @@ const scanCurrentPage = async () => {
   }
 }
 
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
   // Visitor clicks on the extension icon
-  if (isSidePanelOpen) {
+  if (storageCache.isSidePanelOpen) {
+    // Can't be run outside the if statement because
+    // the sidePanel.open method has to be first in the event listener
+    await initStorageCache
     closeSidePanel()
   } else {
     chrome.sidePanel.open({ windowId: tab.windowId })
+    await initStorageCache
   }
   // Toggle side panel visibility
-  isSidePanelOpen = !isSidePanelOpen
+  storageCache.isSidePanelOpen = !storageCache.isSidePanelOpen
+  chrome.storage.local.set(storageCache)
 })
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabs) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tabs) => {
+  await initStorageCache
   if (changeInfo.status === 'complete') {
     scanCurrentPage()
   }
+  chrome.storage.local.set(storageCache)
 })
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  await initStorageCache
   // When the visitor goes to another tab, we close the panel
-  closeSidePanel()
-  // And set panel closed to true
-  isSidePanelOpen = false
+  if (storageCache.isSidePanelOpen) {
+    closeSidePanel()
+  }
+  storageCache.isSidePanelOpen = false
+  chrome.storage.local.set(storageCache)
 })
 
 chrome.runtime.onMessage.addListener(async (message) => {
+  await initStorageCache
   if (message.from === 'side-panel') {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
-    schemaTabId = currentTab?.id
-    elementId = message.elementId
+    storageCache.schemaTabId = currentTab?.id
+    storageCache.elementId = message.elementId
 
     switch (message.message) {
       // When the page loads, we build the schema tree
@@ -133,7 +150,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
         break
       // When the visitor clicks on an element in the schema, we highlight it on the page
       case 'highlight':
-        chrome.tabs.sendMessage(schemaTabId, {
+        chrome.tabs.sendMessage(storageCache.schemaTabId, {
           from: 'service-worker',
           message: 'highlight',
           elementId: message.elementId,
@@ -141,6 +158,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
         break
     }
   }
+  chrome.storage.local.set(storageCache)
 })
 
 // Content script injections (see manifest)
