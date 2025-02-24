@@ -103,14 +103,12 @@ const scanCurrentPage = async () => {
 
 chrome.action.onClicked.addListener(async (tab) => {
   // Visitor clicks on the extension icon
+  chrome.sidePanel.open({ windowId: tab.windowId })
+  await initStorageCache
   if (storageCache.isSidePanelOpen) {
     // Can't be run outside the if statement because
     // the sidePanel.open method has to be first in the event listener
-    await initStorageCache
     closeSidePanel()
-  } else {
-    chrome.sidePanel.open({ windowId: tab.windowId })
-    await initStorageCache
   }
   // Toggle side panel visibility
   storageCache.isSidePanelOpen = !storageCache.isSidePanelOpen
