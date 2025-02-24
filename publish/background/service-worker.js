@@ -106,8 +106,6 @@ chrome.action.onClicked.addListener(async (tab) => {
   chrome.sidePanel.open({ windowId: tab.windowId })
   await initStorageCache
   if (storageCache.isSidePanelOpen) {
-    // Can't be run outside the if statement because
-    // the sidePanel.open method has to be first in the event listener
     closeSidePanel()
   }
   // Toggle side panel visibility
